@@ -1,11 +1,13 @@
 ---
 // The cover page. Built section by section to match design/approved-mockup.html.
-// Done: hero, short version, two crews. Next PR: chapters list, footer.
+// The floating navigation pill is added once the chapter pages exist.
 import Base from '../layouts/Base.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 import Hero from '../components/cover/Hero.astro';
 import ShortVersion from '../components/cover/ShortVersion.astro';
 import TwoCrews from '../components/cover/TwoCrews.astro';
+import ChapterList from '../components/cover/ChapterList.astro';
 ---
 
 <Base title="AI-Assisted Multi-Agent Application Development · Case study">
@@ -14,5 +16,7 @@ import TwoCrews from '../components/cover/TwoCrews.astro';
     <Hero />
     <ShortVersion />
     <TwoCrews />
+    <ChapterList />
   </main>
+  <SiteFooter />
 </Base>

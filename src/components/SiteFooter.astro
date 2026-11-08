@@ -1,0 +1,32 @@
+---
+// Site footer: the call to action for hiring managers. Used on every page.
+// The extra bottom padding (140px) keeps the content clear of the floating navigation pill.
+
+// ⚠️ Contact links. These are public, so only put here what you're happy for anyone to see.
+const contactHref = 'mailto:millberries@gmail.com';
+const linkedInHref = 'https://www.linkedin.com/in/milliechan/';
+---
+
+<footer class="bg-graphite pt-16 pb-35 text-[#cfcfcf]">
+  <div class="mx-auto flex max-w-[1200px] flex-wrap items-end justify-between gap-6 px-4 md:px-10">
+    <h2 class="max-w-[14em] text-[32px] leading-[1.2] text-white">
+      Hiring for AI product design? I’d like to hear from you.
+    </h2>
+    <div class="flex gap-7 font-display text-[18px] tracking-[-0.02em]">
+      <a class="ul" href={contactHref}>Get in touch</a>
+      <a class="ul" href={linkedInHref}>LinkedIn</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* Link with an ember underline: ember is used as a line here, never as text colour */
+  .ul {
+    color: #fff; text-decoration: none; padding-bottom: 2px;
+    background: linear-gradient(var(--color-ember), var(--color-ember)) left bottom / 100% 1px no-repeat;
+    transition: background-size 320ms var(--ease-out-soft);
+  }
+  .ul:hover, .ul:focus-visible { background-size: 100% 2px; }
+  /* The default dark focus ring would vanish on graphite, so use white here */
+  .ul:focus-visible { outline-color: #fff; }
+</style>
