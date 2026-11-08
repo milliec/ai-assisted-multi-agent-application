@@ -2,12 +2,13 @@
 // Chapter 02: Who decides what.
 // Text follows design/approved-mockup.html, corrected against the capstone's documents
 // (mainly approval-map.md, system-description.md, the user stories and the mock data).
-// The "not sure" example and the date demo are added in the next PR.
 import Chapter from '../../layouts/Chapter.astro';
 import Records from '../../components/chapter02/Records.astro';
 import PermissionsTable from '../../components/chapter02/PermissionsTable.astro';
 import CheckpointDemo from '../../components/chapter02/CheckpointDemo.astro';
 import DesignQuestion from '../../components/chapter02/DesignQuestion.astro';
+import NotSure from '../../components/chapter02/NotSure.astro';
+import DateDemo from '../../components/chapter02/DateDemo.astro';
 
 const toc = [
   { id: 'the-four-records', label: 'The four records' },
@@ -89,7 +90,7 @@ const leftOut = [
       required for registered funds, so the right answer is “not sure”, and a human specialist decides.
       An AI that answers “yes, it applies” sounds reasonable but is wrong.
     </p>
-    <!-- Later PR: the OBL-04 verdict card and the answer-key code tabs -->
+    <NotSure />
   </section>
 
   <section id="dates-come-from-code">
@@ -101,7 +102,7 @@ const leftOut = [
       public holiday. Tax deadlines stay where they fall. If nobody has confirmed the rule, the earlier
       date is kept and marked, because filing early is safe.
     </p>
-    <!-- Later PR: the simulated date calculator -->
+    <DateDemo />
   </section>
 
   <section id="left-out-on-purpose">
