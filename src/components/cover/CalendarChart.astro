@@ -1,0 +1,66 @@
+---
+// Dot chart of the 22 due dates in 2027: one column per month, one dot per deadline.
+// Drawn when the site is built (not in the visitor's browser), so it appears instantly,
+// works without JavaScript, and every dot carries a readable label.
+import { calendar2027, reportNames } from '../../data/calendar-2027';
+
+const monthLetters = 'JFMAMJJASOND';
+
+// Turn the data into a flat list of dots with positions, colours and labels.
+let order = 0; // counts dots, so each one pops in slightly after the one before
+const dots = calendar2027.flatMap((month, m) =>
+  month.map((due, k) => {
+    const note =
+      due.status === 'moved' ? ' · moved off a weekend'
+      : due.status === 'unconfirmed' ? ' · weekend rule not yet confirmed'
+      : '';
+    return {
+      x: 21 + m * 30,      // 30 units between month columns
+      y: 84 - k * 22,      // stack upwards from the baseline
+      status: due.status,
+      delay: order++ * 40, // milliseconds
+      label: `${reportNames[due.id]} · due ${due.date} 2027${note}`,
+    };
+  })
+);
+---
+
+<svg viewBox="0 0 372 124" role="img" aria-label="Dot chart of 22 due dates across 2027, one to three per month">
+  <!-- Baseline -->
+  <line x1="6" y1="98" x2="366" y2="98" stroke="var(--color-mist)" />
+
+  {dots.map((d) => (
+    <circle
+      class="dot"
+      cx={d.x}
+      cy={d.y}
+      r="7"
+      fill={d.status === 'moved' ? 'var(--color-ember)' : d.status === 'unconfirmed' ? '#fff' : 'var(--color-brass)'}
+      stroke={d.status === 'unconfirmed' ? 'var(--color-brass)' : undefined}
+      stroke-width={d.status === 'unconfirmed' ? '1.6' : undefined}
+      style={`animation-delay:${d.delay}ms`}
+    >
+      <title>{d.label}</title>
+    </circle>
+  ))}
+
+  {[...monthLetters].map((letter, m) => (
+    <text x={21 + m * 30} y="117" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--color-steel)">{letter}</text>
+  ))}
+</svg>
+
+<style>
+  svg { display: block; max-width: 100%; }
+
+  /* Each dot grows in from small and transparent.
+     "both" keeps it hidden during its delay. The dot's normal (un-animated) state is fully
+     visible, so visitors who turn off motion simply see the finished chart. */
+  .dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: dot-in 420ms var(--ease-out-soft) both;
+  }
+  @keyframes dot-in {
+    from { opacity: 0; transform: scale(0.3); }
+  }
+</style>

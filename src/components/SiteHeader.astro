@@ -1,0 +1,16 @@
+---
+// The site header: wordmark on the left, where-you-are label on the right.
+// There is no top navigation on purpose. The glass pill at the bottom is the only navigation
+// (added in a later PR). Used on every page, so it lives in its own component.
+---
+
+<header>
+  <div class="mx-auto flex h-21 max-w-[1200px] items-center justify-between px-4 md:px-10">
+    <a href="/" class="flex flex-col leading-[1.15] text-graphite no-underline">
+      <span class="font-display text-[18px] tracking-[-0.02em]">Millie Chan</span>
+      <span class="text-[12px] text-steel">Product designer</span>
+    </a>
+    <!-- Hidden on narrow phones, where there isn't room for it -->
+    <span class="hidden font-display text-[13px] text-steel sm:block">Case study · AI for fund compliance</span>
+  </div>
+</header>
