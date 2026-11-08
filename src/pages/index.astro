@@ -1,14 +1,18 @@
 ---
 // The cover page. Built section by section to match design/approved-mockup.html.
-// Done: hero. Next PRs: short version, two crews, chapters list, footer.
+// Done: hero, short version, two crews. Next PR: chapters list, footer.
 import Base from '../layouts/Base.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import Hero from '../components/cover/Hero.astro';
+import ShortVersion from '../components/cover/ShortVersion.astro';
+import TwoCrews from '../components/cover/TwoCrews.astro';
 ---
 
 <Base title="AI-Assisted Multi-Agent Application Development · Case study">
   <SiteHeader />
   <main id="main">
     <Hero />
+    <ShortVersion />
+    <TwoCrews />
   </main>
 </Base>

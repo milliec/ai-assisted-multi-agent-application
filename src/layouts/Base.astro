@@ -32,5 +32,23 @@ const {
   </head>
   <body>
     <slot />
+
+    <script>
+      // Reveal on scroll: see the note in src/styles/global.css.
+      // Visitors who asked for reduced motion see everything straight away.
+      const items = document.querySelectorAll('[data-reveal]');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+        const watcher = new IntersectionObserver(
+          (entries) => entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-in');
+              watcher.unobserve(entry.target); // only reveal once
+            }
+          }),
+          { threshold: 0.3 } // when 30% of the element is on screen
+        );
+        items.forEach((el) => { el.classList.add('reveal-ready'); watcher.observe(el); });
+      }
+    </script>
   </body>
 </html>
