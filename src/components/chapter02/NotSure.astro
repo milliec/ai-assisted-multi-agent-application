@@ -1,0 +1,126 @@
+---
+// Chapter 02, section 2.4: OBL-04, where the right answer is "not sure".
+// Sources (capstone, project-context/1.define/mock-data/):
+//   mock-fund-profile.md FACT-03 (marketed in Luxembourg, Germany, Spain), FACT-04 (CNMV
+//   registration unknown); expected-obligation-library.md §2 (OBL-04 unsure; "applies" is the
+//   tempting wrong answer) and §4 (resolved at checkpoint 2 as "applies (precautionary...)").
+//
+// Design note: the answer key sits next to a test output. The answer key is a set of tables in
+// the capstone, rewritten here as code; the test output is made up, because no tests have run.
+---
+
+<div class="stage wide">
+  <div class="verdict">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <span><span class="font-mono text-[12px]">OBL-04</span> · Quarterly report for Spain</span>
+      <span class="v-pill">Not sure · a human specialist decides</span>
+    </div>
+    <p class="text-[15px] leading-[1.55]">
+      This report is only required if the fund is registered with the Spanish regulator. Being offered
+      to investors in Spain isn’t the same thing, and the fund’s records don’t confirm registration.
+    </p>
+    <div class="fgrid">
+      <div class="fact"><span class="fid">FACT-03</span>Offered to investors in Luxembourg, Germany and Spain</div>
+      <div class="fact unknown"><span class="fid">FACT-04</span>Registered with the Spanish regulator: <b class="font-medium">unknown</b></div>
+    </div>
+  </div>
+
+  <div class="code" data-code>
+    <div class="code-tabs">
+      <div role="tablist" aria-label="Answer key and example test result">
+        <button type="button" role="tab" id="t-key" aria-controls="p-key" aria-selected="true">answer key · OBL-04 (rewritten as code)</button>
+        <button type="button" role="tab" id="t-out" aria-controls="p-out" aria-selected="false" tabindex="-1">made-up example · no tests have run yet</button>
+      </div>
+      <button type="button" class="copy" data-copy>Copy</button>
+    </div>
+<pre id="p-key" role="tabpanel" aria-labelledby="t-key" tabindex="0"><span class="k">code</span>: <span class="s">OBL-04</span>
+<span class="k">fund</span>: <span class="s">FND-DEMO-01</span>
+<span class="k">expected_verdict</span>: <span class="s">unsure</span>
+<span class="k">facts_used</span>: [<span class="s">FACT-03</span>, <span class="s">FACT-04</span>]
+<span class="k">tempting_wrong_answer</span>: <span class="s">applies</span>   <span class="c"># being marketed in Spain is not the same as being registered</span>
+<span class="k">resolved_at_checkpoint_2</span>: <span class="s">applies (precautionary: registration unconfirmed)</span></pre>
+<pre id="p-out" role="tabpanel" aria-labelledby="t-out" tabindex="0" hidden><span class="c">made-up example · applicability · FND-DEMO-01</span>
+<span class="ok">✓</span> OBL-01  applies
+<span class="ok">✓</span> OBL-02  applies
+<span class="ok">✓</span> OBL-03  applies
+<span class="bad">✗</span> OBL-04  expected unsure, got applies
+          <span class="bad">being marketed in Spain is not the same as being registered</span>
+<span class="ok">✓</span> OBL-05  applies
+<span class="ok">✓</span> OBL-06  does not apply
+<span class="c">5 of 6 passed</span></pre>
+  </div>
+</div>
+
+<p class="caption">
+  The answer key also records a tempting wrong answer, so a test can catch a confident mistake.
+</p>
+
+<script>
+  // Tabs: click or use the left/right arrow keys (the standard pattern for accessible tabs)
+  const box = document.querySelector<HTMLElement>('[data-code]');
+  if (box) {
+    const tabs = [...box.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (tab: HTMLButtonElement) => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
+      });
+      tab.focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t));
+      t.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') select(tabs[(i + 1) % tabs.length]);
+        if (e.key === 'ArrowLeft') select(tabs[(i - 1 + tabs.length) % tabs.length]);
+      });
+    });
+
+    // Copy the visible panel's text
+    const copy = box.querySelector<HTMLButtonElement>('[data-copy]')!;
+    copy.addEventListener('click', () => {
+      const pre = [...box.querySelectorAll<HTMLElement>('pre')].find((p) => !p.hidden)!;
+      navigator.clipboard?.writeText(pre.innerText).then(
+        () => { copy.textContent = 'Copied ✓'; setTimeout(() => (copy.textContent = 'Copy'), 1500); },
+        () => {}
+      );
+    });
+  }
+</script>
+
+<style>
+  .verdict { background: var(--color-canvas-white); border-radius: 20px; padding: 24px; }
+  .v-pill {
+    padding: 6px 10px; border-radius: 20px; box-shadow: inset 0 0 0 1px var(--color-brass);
+    font: 500 12px/1 var(--font-sans); color: var(--color-brass);
+  }
+  .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  @media (max-width: 600px) { .fgrid { grid-template-columns: 1fr; } }
+  .fact { padding: 12px 14px; border-radius: 8px; background: var(--color-fog); font-size: 13px; }
+  .fact.unknown { background: #faf8f4; box-shadow: inset 0 0 0 1px var(--color-ivory); }
+  .fid { display: block; margin-bottom: 4px; font: 400 12px var(--font-mono); color: var(--color-steel); }
+
+  /* ---------- Dark code panel ---------- */
+  .code { margin-top: 16px; overflow: hidden; border-radius: 8px; background: #1b1b1b; color: #e6e6e6; }
+  .code-tabs { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding-right: 10px; border-bottom: 1px solid #2c2c2c; }
+  [role="tablist"] { display: flex; flex-wrap: wrap; }
+  [role="tab"] {
+    margin-bottom: -1px; padding: 12px 16px; border: 0; border-bottom: 1px solid transparent; background: none; cursor: pointer;
+    font: 400 12px var(--font-mono); color: #a8a8a8; text-align: left;
+  }
+  [role="tab"][aria-selected="true"] { color: #fff; border-bottom-color: var(--color-ember); }
+  [role="tab"]:focus-visible, .copy:focus-visible, pre:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+  .copy { padding: 5px 9px; border: 1px solid #3a3a3a; background: none; cursor: pointer; font: 400 11px var(--font-mono); color: #bdbdbd; }
+  .copy:hover { border-color: #777; color: #fff; }
+  pre { overflow-x: auto; padding: 18px 20px; font: 400 13px/1.7 var(--font-mono); }
+  pre[hidden] { display: none; }
+  /* Code colours, all readable on the dark background */
+  .k { color: #d9c08a; }   /* field names */
+  .s { color: #a8c7a0; }   /* values */
+  .c { color: #9a9a9a; }   /* comments */
+  .ok { color: #a8c7a0; }
+  .bad { color: #ff9c78; }
+
+  .caption { max-width: 680px; margin-top: 12px; font-size: 13px; line-height: 1.45; color: var(--color-steel); }
+</style>
