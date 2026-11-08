@@ -20,13 +20,8 @@ const linkedInHref = 'https://www.linkedin.com/in/milliechan/';
 </footer>
 
 <style>
-  /* Link with an ember underline: ember is used as a line here, never as text colour */
-  .ul {
-    color: #fff; text-decoration: none; padding-bottom: 2px;
-    background: linear-gradient(var(--color-ember), var(--color-ember)) left bottom / 100% 1px no-repeat;
-    transition: background-size 320ms var(--ease-out-soft);
-  }
-  .ul:hover, .ul:focus-visible { background-size: 100% 2px; }
+  /* The underline style itself (.ul) is shared, in global.css. Here: white text on graphite. */
+  .ul { color: #fff; }
   /* The default dark focus ring would vanish on graphite, so use white here */
   .ul:focus-visible { outline-color: #fff; }
 </style>
