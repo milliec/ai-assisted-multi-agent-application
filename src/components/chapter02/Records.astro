@@ -1,0 +1,97 @@
+---
+// Chapter 02, section 2.1: the four kinds of record in the planned product.
+// Sources (capstone): system-description.md (source paragraphs and calendar entries get stable
+// IDs: FR-016; entries can be marked out of date; the calendar-level review notice: FR-025),
+// user-stories US-004 (row states), US-006/007 (verdicts), mock-regulatory-sources.md (source types).
+//
+// Design note: records and their states come before screens. The arrows show what each record
+// is made from. Only paragraphs and deadlines have ID formats in the documents; the other two
+// IDs shown are example formats, and say so.
+
+const records = [
+  {
+    kind: 'A paragraph of law',
+    id: 'SRC-CSSF15627-P2',
+    example: false,
+    by: 'Test text written to read like the law. Not changed by the tool.',
+    tagsLabel: 'Type',
+    tags: ['the law itself', 'a summary of it'],
+  },
+  {
+    kind: 'A rule',
+    id: 'OBL-01',
+    example: false,
+    by: 'Pulled out by an AI agent, checked by a second one, then decided by a human specialist at checkpoint 1.',
+    tagsLabel: 'States',
+    tags: ['waiting', 'approved', 'rejected'],
+    note: 'Any rule can also carry a “sources disagree” flag.',
+  },
+  {
+    kind: 'A decision',
+    id: 'OBL-01 × FND-DEMO-01',
+    example: true,
+    by: 'Does the rule apply to this fund? Suggested by AI, decided by a human specialist at checkpoint 2.',
+    tagsLabel: 'Answers',
+    tags: ['applies', 'doesn’t apply', 'not sure'],
+  },
+  {
+    kind: 'A deadline',
+    id: 'OBL-01 · 2027-01',
+    example: true,
+    by: 'Worked out by code, published by a human specialist at checkpoint 3.',
+    tagsLabel: 'States',
+    tags: ['draft', 'published', 'out of date'],
+  },
+];
+---
+
+<div class="stage wide">
+  <ol class="objects">
+    {records.map((r) => (
+      <li class="obj">
+        <span class="k">{r.kind}</span>
+        <span class="id">{r.id}{r.example && <span class="ex"> example format</span>}</span>
+        <p class="by">{r.by}</p>
+        <p class="tags-label">{r.tagsLabel}</p>
+        <div class="flex flex-wrap gap-1">
+          {r.tags.map((t) => <span class="state">{t}</span>)}
+        </div>
+        {r.note && <p class="note">{r.note}</p>}
+      </li>
+    ))}
+  </ol>
+</div>
+
+<p class="caption">
+  If a correction calls a published calendar into question, the fund manager sees a neutral
+  “under review” notice on the whole calendar until a corrected one is published. The notice
+  warns; it doesn’t stop anyone relying on a wrong date.
+</p>
+
+<style>
+  .objects { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  @media (max-width: 760px) { .objects { grid-template-columns: 1fr; gap: 26px; } }
+
+  .obj { position: relative; background: var(--color-canvas-white); border-radius: 8px; padding: 16px; }
+  /* Arrow to the next record: sideways on wide screens, downwards when stacked */
+  .obj:not(:last-child)::after {
+    content: "→"; position: absolute; right: -21px; top: 16px;
+    font: 400 16px var(--font-display); color: var(--color-steel);
+  }
+  @media (max-width: 760px) {
+    .obj:not(:last-child)::after { content: "↓"; right: auto; left: 18px; top: auto; bottom: -24px; }
+  }
+
+  .k { font: 400 13px var(--font-display); color: var(--color-brass); }
+  .id { display: block; margin: 8px 0; font: 400 12px var(--font-mono); color: var(--color-graphite); word-break: break-all; }
+  .ex { font-family: var(--font-sans); font-size: 11px; color: var(--color-steel); word-break: normal; }
+  .by { margin-bottom: 10px; font-size: 12px; line-height: 1.4; color: var(--color-steel); }
+  .tags-label { margin-bottom: 4px; font-size: 11px; color: var(--color-steel); }
+  .state {
+    padding: 4px 7px; border-radius: 20px; background: var(--color-fog);
+    font: 500 11px/1 var(--font-sans); color: var(--color-steel);
+  }
+  .note { margin-top: 8px; font-size: 11px; line-height: 1.4; color: var(--color-steel); }
+
+  .caption { max-width: 680px; margin-top: 12px; font-size: 13px; line-height: 1.45; color: var(--color-steel); }
+</style>

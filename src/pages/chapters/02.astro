@@ -1,0 +1,120 @@
+---
+// Chapter 02: Who decides what.
+// Text follows design/approved-mockup.html, corrected against the capstone's documents
+// (mainly approval-map.md, system-description.md, the user stories and the mock data).
+// The two simulated demos and the "not sure" example are added in the next PRs.
+import Chapter from '../../layouts/Chapter.astro';
+import Records from '../../components/chapter02/Records.astro';
+import PermissionsTable from '../../components/chapter02/PermissionsTable.astro';
+
+const toc = [
+  { id: 'the-four-records', label: 'The four records' },
+  { id: 'who-may-do-what', label: 'Who may do what' },
+  { id: 'one-decision-at-a-time', label: 'One decision at a time' },
+  { id: 'when-not-sure-is-right', label: 'When “not sure” is right' },
+  { id: 'dates-come-from-code', label: 'Dates come from code' },
+  { id: 'left-out-on-purpose', label: 'Left out on purpose' },
+];
+
+// Source: system-description.md (out-of-scope list and deferred items)
+const leftOut = [
+  ['Taking back a published calendar', 'Deliberately postponed for this demo. To be looked at again before any real-world use.'],
+  ['Tracking whether a report was sent', 'Out of scope. Permanent deadline IDs keep the option open.'],
+  ['Reminding the outside firms', 'Out of scope. Each deadline already names who sends it.'],
+];
+---
+
+<Chapter
+  n="02"
+  title="Who decides what"
+  lede="Before designing any screens, I worked with AI to draft an approval map: every action in the planned product and who may take it. In the planned product, AI agents can only suggest, a human specialist approves, and plain code works out every date."
+  readingTime="6 min"
+  phase="Define"
+  glance={[
+    { value: '4', label: 'kinds of record in the plan' },
+    { value: '3', label: 'checkpoints where a human specialist signs off' },
+    { value: '2', label: 'simulated demos you can try' },
+  ]}
+  toc={toc}
+  next={{ n: '03', title: 'Directing the agents', note: 'Added each sprint' }}
+>
+  <section id="the-four-records">
+    <h2><span class="num">2.1</span>The four records</h2>
+    <p class="first">
+      The planned product keeps four kinds of record. Paragraphs of law and calendar deadlines get IDs
+      that stay the same every time the tool runs, and rules have codes such as OBL-01. So any date on
+      the calendar can be traced back to the paragraph of law it came from, and to the human specialist
+      who approved it.
+    </p>
+    <p>
+      Tracking whether a report has been sent is out of scope for now. Because each deadline keeps the
+      same ID, a future record of what was sent can point to it.
+    </p>
+    <Records />
+  </section>
+
+  <section id="who-may-do-what">
+    <h2><span class="num">2.2</span>Who may do what</h2>
+    <p>
+      Working with AI, I drafted an approval map: every action in the planned product, and whether it
+      can happen on its own, needs a human specialist’s approval, or must never happen. The table below
+      simplifies it. The most important cells say <strong>Never</strong>: no AI agent can ever approve,
+      reject or publish anything, and no AI can set a date.
+    </p>
+    <PermissionsTable />
+  </section>
+
+  <section id="one-decision-at-a-time">
+    <h2><span class="num">2.3</span>One decision at a time</h2>
+    <p>
+      A human specialist approves, edits or rejects each rule on its own. There is no “approve all”
+      button, and nothing is ticked in advance. Separate clicks encourage careful review, but they can’t
+      prove it happened.
+    </p>
+    <!-- Next PR: the simulated checkpoint 1 demo, its audit log, and the design question card -->
+  </section>
+
+  <section id="when-not-sure-is-right">
+    <h2><span class="num">2.4</span>When “not sure” is right</h2>
+    <p>
+      Sometimes the honest answer is “not sure”. The fictional fund is offered to investors in Spain,
+      but nobody has confirmed it is registered with the Spanish regulator. The Spanish report is only
+      required for registered funds, so the right answer is “not sure”, and a human specialist decides.
+      An AI that answers “yes, it applies” sounds reasonable but is wrong.
+    </p>
+    <!-- Later PR: the OBL-04 verdict card and the answer-key code tabs -->
+  </section>
+
+  <section id="dates-come-from-code">
+    <h2><span class="num">2.5</span>Dates come from code</h2>
+    <p>
+      Month ends, leap years and weekends are easy to get wrong, so no AI will set a date. Plain code
+      will take a starting date, add the time allowed, then apply that report’s own weekend rule, set by
+      a human specialist. Some deadlines move to the next working day if they land on a weekend or
+      public holiday. Tax deadlines stay where they fall. If nobody has confirmed the rule, the earlier
+      date is kept and marked, because filing early is safe.
+    </p>
+    <!-- Later PR: the simulated date calculator -->
+  </section>
+
+  <section id="left-out-on-purpose">
+    <h2><span class="num">2.6</span>Left out on purpose</h2>
+    <p>I list each thing I left out, with the reason, so a reader can tell a deliberate choice from something forgotten.</p>
+    <ul class="leftout">
+      {leftOut.map(([what, why]) => (
+        <li><span>{what}</span><span class="why">{why}</span></li>
+      ))}
+    </ul>
+  </section>
+</Chapter>
+
+<style>
+  .leftout { display: grid; gap: 8px; margin-top: 20px; }
+  .leftout li {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 20px;
+    background: var(--color-fog); border-radius: 8px;
+    font: 400 16px var(--font-display); letter-spacing: -0.01em;
+  }
+  .leftout .why { font: 400 14px var(--font-sans); letter-spacing: 0; color: var(--color-steel); }
+  @media (max-width: 600px) { .leftout li { grid-template-columns: 1fr; gap: 4px; } }
+</style>

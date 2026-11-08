@@ -17,7 +17,9 @@ interface Props {
   phase: string;                               // which project phase the chapter covers
   glance: { value: string; label: string }[];  // the three "at a glance" numbers
   toc: { id: string; label: string }[];        // sections, in order (ids match <section id>)
-  next?: { n: string; title: string; href: string };
+  // The next chapter. With href it is a link; without one (not written yet) it is a quiet,
+  // unclickable card, and `note` replaces "Next chapter" (e.g. "Added each sprint").
+  next?: { n: string; title: string; href?: string; note?: string };
 }
 
 const { n, title, lede, readingTime, phase, glance, toc, next } = Astro.props;
@@ -66,14 +68,22 @@ const { n, title, lede, readingTime, phase, glance, toc, next } = Astro.props;
       <article class="article">
         <slot />
 
-        {next && (
+        {next && next.href && (
           <a class="next" href={next.href}>
             <div>
-              <small><span class="font-mono">[{next.n}]</span> Next chapter</small>
+              <small><span class="font-mono">[{next.n}]</span> {next.note ?? 'Next chapter'}</small>
               <h3>{next.title}</h3>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
           </a>
+        )}
+        {next && !next.href && (
+          <div class="next next-off">
+            <div>
+              <small><span class="font-mono">[{next.n}]</span> {next.note ?? 'Coming later'}</small>
+              <h3>{next.title}</h3>
+            </div>
+          </div>
         )}
       </article>
     </div>
@@ -173,6 +183,9 @@ const { n, title, lede, readingTime, phase, glance, toc, next } = Astro.props;
   .next h3 { font-size: 36px; line-height: 1.1; }
   .next .arrow { font: 400 36px var(--font-display); transition: transform 320ms var(--ease-out-soft); }
   .next:hover .arrow { transform: translateX(8px); }
+  /* Not written yet: grey card, quieter title, no arrow */
+  .next-off { background: var(--color-fog); }
+  .next-off h3 { color: var(--color-steel); }
   @media (max-width: 720px) { .next { padding: 24px; } .next h3 { font-size: 28px; } }
 </style>
 
