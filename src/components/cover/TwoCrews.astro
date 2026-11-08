@@ -3,6 +3,7 @@
 // application crew (inside the product). Matches the white band in design/approved-mockup.html.
 //
 // The ten roles match the ten agent files in the capstone's .cursor/agents/ folder.
+// Phase names and grouping follow the capstone's prd.md (Define / Build / Deliver).
 // Keep the status honest: update it as each agent actually does its work.
 //   'done'  = has done its work      'next' = up next      'later' = a later phase
 
@@ -11,7 +12,7 @@ const statusLabel: Record<Status, string> = { done: 'Done', next: 'Next', later:
 
 const phases: { name: string; roles: [string, Status][] }[] = [
   {
-    name: 'Plan',
+    name: 'Define',
     roles: [
       ['Product manager', 'done'],
       ['System architect', 'next'],
@@ -30,7 +31,7 @@ const phases: { name: string; roles: [string, Status][] }[] = [
     ],
   },
   {
-    name: 'Launch',
+    name: 'Deliver',
     roles: [['Release engineer (DevOps)', 'later']],
   },
 ];
