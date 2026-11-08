@@ -90,6 +90,20 @@
   }
 }
 
+/* =====================================================================
+   Reveal on scroll (charts and numbers only, never body text)
+   Add data-reveal to an element. The script in Base.astro adds "reveal-ready"
+   (hide it), then "is-in" when it scrolls into view (show it). Without
+   JavaScript neither class is added, so nothing is ever hidden.
+   ===================================================================== */
+.reveal-ready {
+  transition: opacity 600ms var(--ease-out-soft), transform 600ms var(--ease-out-soft);
+}
+.reveal-ready:not(.is-in) {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
 /* Respect visitors who turned on "reduce motion" in their system settings */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

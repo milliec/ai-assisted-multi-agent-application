@@ -1,0 +1,84 @@
+---
+// "The short version": five plain points and four numbers, for readers who won't scroll.
+// Matches the ash band in design/approved-mockup.html.
+//
+// Design note: every point and number can be checked against the capstone's documents:
+//   [1] 3 vs 10 days ........ project-context/1.define/mrd.md (lead-time table)
+//   [3] no "approve all" .... capstone-brief.md, prd.md §6
+//   [4] dates by code ....... prd.md ("Date calculation is not an agent responsibility")
+//   [5] / 22 deadlines ...... mock-data/expected-obligation-library.md §4
+//   30 min target ........... prd.md (specialist time, under 30 minutes)
+---
+
+<!-- id="short" is where the hero's "Read the short version" button jumps to -->
+<section id="short" class="scroll-mt-6 bg-ash py-14 md:py-20">
+  <div class="mx-auto max-w-[1200px] px-4 md:px-10">
+    <div class="grid gap-6 min-[900px]:grid-cols-[320px_1fr] min-[900px]:gap-15">
+      <div>
+        <p class="mb-3.5 font-display text-[13px] leading-[1.38] tracking-[-0.01em] text-brass">About two minutes</p>
+        <h2 class="text-[40px] leading-[1.1]">The short version</h2>
+      </div>
+
+      <ol class="grid gap-6">
+        <li class="point">
+          <span class="num">[1]</span>
+          <span>Today a compliance specialist reads the law and types every reporting deadline into a spreadsheet by hand. Mistakes slip in: two of the team’s own documents give the same monthly report different lead times, 3 days and 10 days.</span>
+        </li>
+        <li class="point">
+          <span class="num">[2]</span>
+          <span>In my tool, AI agents do the first reading of the law. Every rule they pull out must quote the exact sentence it came from, and a second AI agent checks that the quote is real.</span>
+        </li>
+        <li class="point">
+          <span class="num">[3]</span>
+          <span>A human specialist then approves each rule, one at a time, at three checkpoints. There is <strong>no “approve all” button</strong>, and nothing is approved by default.</span>
+        </li>
+        <li class="point">
+          <span class="num">[4]</span>
+          <span>The deadlines themselves are worked out by ordinary code, not by AI, so the same input always gives the same date.</span>
+        </li>
+        <li class="point">
+          <span class="num">[5]</span>
+          <span>Before building anything, I wrote an answer key: the exact results the tool should produce, down to all 22 deadlines. Every test run will be marked against it.</span>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Design note: every number is a claim someone can check in the repo. White data cards on
+         ash, with ember used only as a short line (never as text). -->
+    <div class="mt-16 grid grid-cols-2 gap-5 min-[860px]:grid-cols-4">
+      <div class="stat" data-reveal><span class="rule"></span><b>3</b><span>checkpoints where a person signs off</span></div>
+      <div class="stat" data-reveal><span class="rule"></span><b>0</b><span>deadlines calculated by AI</span></div>
+      <div class="stat" data-reveal><span class="rule"></span><b>22</b><span>deadlines in the answer key</span></div>
+      <div class="stat" data-reveal><span class="rule"></span><b>30<small>min</small></b><span>target time for a person to review the AI’s work</span></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- The five points ---------- */
+  .point {
+    display: grid; grid-template-columns: 44px 1fr; gap: 12px;
+    font-size: 17px; line-height: 1.55; color: var(--color-steel);
+  }
+  .num { font-family: var(--font-mono); font-size: 13px; color: var(--color-brass); padding-top: 4px; }
+  .point strong { color: var(--color-graphite); font-weight: 500; }
+
+  /* ---------- The four numbers ---------- */
+  .stat { background: var(--color-canvas-white); border-radius: 20px; padding: 28px 24px; }
+  .stat b {
+    display: block; margin-bottom: 14px;
+    font: 400 clamp(44px, 4.6vw, 60px)/1 var(--font-display);
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  .stat b small { font-size: 0.38em; letter-spacing: 0; margin-left: 4px; }
+  .stat > span:last-child { display: block; font-size: 14px; line-height: 1.43; color: var(--color-steel); }
+
+  /* The short ember line draws itself when the card scrolls into view.
+     "is-in" is added by the reveal script in Base.astro. */
+  .rule {
+    display: block; height: 2px; width: 28px; margin-bottom: 22px; background: var(--color-ember);
+    transition: width 700ms var(--ease-out-soft);
+  }
+  /* Waiting to scroll into view: line not drawn yet */
+  :global(.reveal-ready:not(.is-in)) .rule { width: 0; }
+</style>

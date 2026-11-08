@@ -1,0 +1,101 @@
+---
+// "One designer, two crews of AI agents": the development crew (helps build) and the
+// application crew (inside the product). Matches the white band in design/approved-mockup.html.
+//
+// The ten roles match the ten agent files in the capstone's .cursor/agents/ folder.
+// Keep the status honest: update it as each agent actually does its work.
+//   'done'  = has done its work      'next' = up next      'later' = a later phase
+
+type Status = 'done' | 'next' | 'later';
+const statusLabel: Record<Status, string> = { done: 'Done', next: 'Next', later: 'Later' };
+
+const phases: { name: string; roles: [string, Status][] }[] = [
+  {
+    name: 'Plan',
+    roles: [
+      ['Product manager', 'done'],
+      ['System architect', 'next'],
+      ['UX designer', 'next'],
+    ],
+  },
+  {
+    name: 'Build',
+    roles: [
+      ['Project manager', 'later'],
+      ['Front-end engineer', 'later'],
+      ['Back-end engineer', 'later'],
+      ['Integration engineer', 'later'],
+      ['Tester (QA)', 'later'],
+      ['Security engineer', 'later'],
+    ],
+  },
+  {
+    name: 'Launch',
+    roles: [['Release engineer (DevOps)', 'later']],
+  },
+];
+---
+
+<section class="py-14 md:py-20">
+  <div class="mx-auto max-w-[1200px] px-4 md:px-10">
+    <div class="grid items-start gap-4 min-[900px]:grid-cols-[320px_1fr] min-[900px]:gap-15">
+      <div>
+        <p class="mb-3.5 font-display text-[13px] leading-[1.38] tracking-[-0.01em] text-brass">How it is built</p>
+        <h2 class="text-heading">One designer, two crews of AI agents</h2>
+      </div>
+      <div class="intro">
+        <p>
+          The <strong>development crew</strong> helps me build. It is ten AI agents, each set up to play
+          one role on a product team, such as architect, engineer or tester. They follow a method called
+          AI-Assisted Multi-Agent Application Development. I brief each one, review its work and make the
+          decisions it isn’t allowed to make.
+        </p>
+        <p class="mt-3.5">
+          The <strong>application crew</strong> lives inside the product. These are the AI agents that
+          read the law, check the quotes and suggest which rules apply to the fund. They are planned to
+          run on CrewAI, a tool for running teams of AI agents.
+        </p>
+      </div>
+    </div>
+
+    <p class="mt-10 mb-3 font-display text-[13px] leading-[1.38] tracking-[-0.01em] text-brass">Development crew, by phase</p>
+
+    <!-- Design note: adapts a partner-logo strip. Status is honest: only one agent has done its
+         work so far. -->
+    <div class="grid gap-2.5">
+      {phases.map((phase) => (
+        <div class="grid items-center gap-2.5 rounded-lg bg-fog px-[18px] py-3.5 sm:grid-cols-[120px_1fr] sm:gap-5">
+          <h3 class="text-[16px]">{phase.name}</h3>
+          <ul class="flex flex-wrap gap-2">
+            {phase.roles.map(([role, status]) => (
+              <li class:list={['persona', status]}>
+                {status === 'done' && (
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+                    <path d="M3 8.5l3 3 7-7" />
+                  </svg>
+                )}
+                {role} <em>{statusLabel[status]}</em>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .intro p { font-size: 17px; line-height: 1.6; color: var(--color-steel); max-width: 36em; }
+  .intro strong { color: var(--color-graphite); font-weight: 500; }
+
+  /* Each role is a white tag with its status in small text */
+  .persona {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 400 15px/1 var(--font-display); letter-spacing: -0.01em;
+    background: var(--color-canvas-white); padding: 9px 12px; border-radius: 20px;
+  }
+  .persona svg { width: 15px; height: 15px; }
+  .persona em { font: 500 11px var(--font-sans); font-style: normal; color: var(--color-steel); }
+  .persona.done em { color: var(--color-brass); }
+  .persona.later { color: var(--color-steel); }
+</style>
