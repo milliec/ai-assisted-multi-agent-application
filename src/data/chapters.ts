@@ -29,7 +29,7 @@ export const statusLabel: Record<ChapterStatus, { long: string; short: string }>
 
 export const chapters: Chapter[] = [
   { n: '01', title: 'The problem', summary: 'Who keeps track of these deadlines today, how, and where it goes wrong.', status: 'written', href: '/chapters/01' },
-  { n: '02', title: 'Who decides what', summary: 'What the AI may do, what only a person may do, and the three checkpoints.', status: 'written', href: '/chapters/02' },
+  { n: '02', title: 'Who decides what', summary: 'What the AI may do, what only a human specialist may do, and the three checkpoints.', status: 'written', href: '/chapters/02' },
   { n: '03', title: 'Directing the agents', summary: 'The instructions I give AI tools, and what happened when they weren’t enough.', status: 'collecting' },
   { n: '04', title: 'Architecture', summary: 'The AI agents, the checker and the code that works out dates.', status: 'build' },
   { n: '05', title: 'Interface', summary: 'The specialist’s review screens and the fund manager’s calendar.', status: 'build' },

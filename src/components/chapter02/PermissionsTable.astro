@@ -1,0 +1,82 @@
+---
+// Chapter 02, section 2.2: who may take each action. A simplified view of the capstone's
+// draft approval map (project-context/1.define/approval-map.md: Alone / Ask / Never rules),
+// drawn here as actions against actors.
+// Sources: approval-map.md A10 (no AI sets dates), A14 (agents never approve, reject, override,
+// reopen, publish or decline), G1r (fund manager reads published calendar only);
+// system-description.md FR-022 (publish or decline with a reason), MN-004 (checker never settles).
+//
+// Design note: dense-table craft. Hairlines only, aligned columns, and the deciding cells in
+// weight 500 so the eye finds them first.
+
+type Cell = { text: string; kind?: 'never' | 'decides' } | null; // null = not involved
+
+const columns = ['AI agents', 'Human specialist', 'Fund manager', 'Code'];
+const rows: { action: string; cells: Cell[] }[] = [
+  { action: 'Pull rules out of the law', cells: [{ text: 'Suggest' }, null, null, null] },
+  { action: 'Flag disagreements between sources', cells: [{ text: 'Flag (checker)' }, { text: 'Decides what to do', kind: 'decides' }, null, null] },
+  { action: 'Approve or reject a rule (checkpoint 1)', cells: [{ text: 'Never', kind: 'never' }, { text: 'Decides each one', kind: 'decides' }, null, null] },
+  { action: 'Decide if a rule applies to the fund (checkpoint 2)', cells: [{ text: 'Suggest' }, { text: 'Confirms or changes', kind: 'decides' }, null, null] },
+  { action: 'Work out deadlines', cells: [{ text: 'Never', kind: 'never' }, null, null, { text: 'Calculates', kind: 'decides' }] },
+  { action: 'Publish the calendar (checkpoint 3)', cells: [{ text: 'Never', kind: 'never' }, { text: 'Publishes, or declines with a reason', kind: 'decides' }, null, null] },
+  { action: 'Read the published calendar', cells: [null, { text: 'Yes' }, { text: 'Yes' }, null] },
+];
+---
+
+<div class="table-wrap" tabindex="0" role="region" aria-label="Who may take each action (scrolls sideways on small screens)">
+  <table>
+    <caption class="sr-only">Who may take each action in the planned product</caption>
+    <thead>
+      <tr>
+        <th scope="col">Action</th>
+        {columns.map((c) => <th scope="col">{c}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row">{r.action}</th>
+          {r.cells.map((cell) =>
+            cell ? (
+              <td class={cell.kind}>
+                {cell.kind === 'never' && <span class="never-mark" aria-hidden="true">⊘ </span>}
+                {cell.text}
+              </td>
+            ) : (
+              // A faint dash for the eye, real words for screen readers
+              <td class="na"><span aria-hidden="true">–</span><span class="sr-only">Not involved</span></td>
+            )
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<blockquote class="pull">
+  “Never” means the button doesn’t exist.
+  <cite>From my learning notes, Define phase</cite>
+</blockquote>
+
+<style>
+  /* position: relative keeps the hidden screen-reader labels inside this scrolling box.
+     Without it they escape past the screen edge and make the whole page scroll sideways. */
+  .table-wrap { position: relative; overflow-x: auto; border-radius: 20px; margin-top: 32px; box-shadow: 0 0 0 1px var(--color-mist); }
+  table { width: 100%; min-width: 560px; border-collapse: collapse; background: var(--color-canvas-white); font-size: 14px; }
+  th, td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--color-fog); }
+  thead th { padding-top: 16px; border-bottom: 1px solid var(--color-mist); font: 400 13px var(--font-display); color: var(--color-brass); }
+  tbody th { font-weight: 400; }
+  tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+
+  .decides { font-weight: 500; color: var(--color-graphite); }
+  .never { font-weight: 500; color: var(--color-graphite); white-space: nowrap; }
+  /* Brass, not ember: the symbol is a text character, and ember is never used as text colour */
+  .never-mark { font-weight: 400; color: var(--color-brass); }
+  .na { color: #bdbdbd; }
+
+  .pull {
+    max-width: 680px; margin-top: 40px; padding-left: 24px; border-left: 2px solid var(--color-ember);
+    font: 400 26px/1.3 var(--font-display); letter-spacing: -0.02em; color: var(--color-graphite);
+  }
+  .pull cite { display: block; margin-top: 12px; font: 400 13px var(--font-sans); font-style: normal; color: var(--color-steel); }
+</style>
