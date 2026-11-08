@@ -101,6 +101,13 @@
 }
 .ul:hover, .ul:focus-visible { background-size: 100% 2px; }
 
+/* Chip: a small grey label, e.g. a report name. Usage: class="chip" */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font: 500 12px/1 var(--font-sans); color: var(--color-graphite);
+  background: var(--color-fog); border-radius: var(--radius-2xl); padding: 5px 9px;
+}
+
 /* =====================================================================
    Reveal on scroll (charts and numbers only, never body text)
    Add data-reveal to an element. The script in Base.astro adds "reveal-ready"

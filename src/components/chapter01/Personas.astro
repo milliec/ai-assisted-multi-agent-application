@@ -1,0 +1,125 @@
+---
+// Chapter 01, section 1.1: the two early user profiles, the outside firms, and the open questions.
+// Sources (capstone): prd.md personas and user needs UN-S2..S6, UN-G1..G4; brief §users;
+// mrd.md (GPs get a static document, no live view); system-description.md (filing parties).
+//
+// Design note: labelled as early profiles, because nobody has been interviewed yet
+// (prd.md A-7). Each need traces to a requirement in the project documents.
+
+const profiles = [
+  {
+    name: 'Compliance specialist',
+    role: 'The main user. Owns the fund’s deadline calendar.',
+    icon: 'doc',
+    today:
+      'Reads every new set of rules, works out what each one requires, sets deadlines by hand and chases the outside firms that send the reports.',
+    needs: [
+      'See exactly where each rule comes from, so it can be checked quickly.',
+      'Have disagreements between sources caught by a check, not by luck.',
+      'Nothing important happens without their approval.',
+      'Deadlines worked out the same way every time.',
+    ],
+  },
+  {
+    name: 'Fund manager',
+    role: 'Only reads the finished calendar.',
+    icon: 'calendar',
+    today:
+      'Responsible for the reports being sent, but sends few of them personally. Today they get a fixed legal document. Managers based outside Luxembourg know the local rules least well.',
+    needs: [
+      'Know what is due and when, without reading legal text.',
+      'Understand why each report applies to their fund.',
+      'Know who sends each report, so they know whether they need to act.',
+      'See only information a human specialist has approved.',
+    ],
+  },
+];
+
+// "Management company" rather than "Fund management company", so it isn't confused
+// with the fund manager profile above.
+const firms = ['Management company', 'Administrator', 'Auditor', 'Tax adviser', 'Local agent'];
+---
+
+<div class="stage wide">
+  <p class="pnote"><span class="font-mono">[!]</span>Early profiles, based on project documents. Nobody has been interviewed yet.</p>
+
+  <div class="grid gap-5 md:grid-cols-2">
+    {profiles.map((p) => (
+      <div class="pcard">
+        <div class="mb-[18px] flex items-center gap-3.5">
+          <span class="glyph" aria-hidden="true">
+            {p.icon === 'doc' ? (
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="3" y="2" width="10" height="12" rx="1" /><path d="M5.5 5.5h5M5.5 8h5M5.5 10.5h3" /></svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="2" y="3" width="12" height="11" rx="1" /><path d="M2 6.5h12M5 1.5v3M11 1.5v3" /></svg>
+            )}
+          </span>
+          <div>
+            <h3 class="text-[22px] leading-[1.15]">{p.name}</h3>
+            <span class="mt-0.5 block text-[13px] leading-[1.4] text-steel">{p.role}</span>
+          </div>
+        </div>
+        <p class="today">{p.today}</p>
+        <h4>Needs</h4>
+        <ul class="needs">
+          {p.needs.map((need) => <li>{need}</li>)}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <div class="filers">
+    <div>
+      <b class="font-display text-[16px] font-normal">Outside firms that send the reports</b>
+      <p class="filers-note">Each deadline names who sends it. They are not users in this version.</p>
+    </div>
+    <div class="flex flex-wrap gap-1.5 sm:justify-end">
+      {firms.map((f) => <span class="chip">{f}</span>)}
+    </div>
+  </div>
+</div>
+
+<!-- Design note: the research gap is stated openly. These questions become the interview plan
+     for the build phase. -->
+<div class="validate">
+  <h4>What I still need to check with real people</h4>
+  <ol>
+    <li>How long does it take today to set up deadlines for a new set of rules, and which part takes longest?</li>
+    <li>Would a human specialist approve a rule from its quote alone, or still open the full law?</li>
+    <li>Does a fund manager want the reason behind each deadline, or only the date and who sends it?</li>
+  </ol>
+</div>
+
+<style>
+  .pnote { display: flex; gap: 10px; align-items: baseline; margin-bottom: 16px; font-size: 13px; color: var(--color-brass); }
+
+  .pcard { background: var(--color-canvas-white); border-radius: 20px; padding: 28px; }
+  .glyph {
+    display: grid; place-items: center; flex: none;
+    width: 44px; height: 44px; border-radius: 50%; background: var(--color-ivory); color: var(--color-graphite);
+  }
+  .today { font-size: 14px; line-height: 1.5; color: var(--color-steel); }
+  .pcard h4 { margin: 18px 0 8px; font: 400 13px var(--font-display); color: var(--color-brass); }
+  .needs { display: grid; gap: 8px; }
+  .needs li { position: relative; padding-left: 16px; font-size: 14px; line-height: 1.45; }
+  /* Small brass dot as the bullet */
+  .needs li::before {
+    content: ""; position: absolute; left: 2px; top: 0.6em;
+    width: 5px; height: 5px; border-radius: 50%; background: var(--color-brass);
+  }
+
+  .filers {
+    display: grid; gap: 16px; align-items: center; margin-top: 20px;
+    background: var(--color-canvas-white); border-radius: 20px; padding: 20px 24px;
+  }
+  @media (min-width: 640px) { .filers { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); } }
+  .filers-note { margin-top: 4px; font-size: 13px; line-height: 1.4; color: var(--color-steel); }
+
+  /* Open questions: set off by a thin ember line on the left */
+  .validate { max-width: 680px; border-left: 2px solid var(--color-ember); padding: 4px 0 4px 20px; }
+  .validate h4 { margin-bottom: 10px; font: 400 18px var(--font-display); }
+  .validate ol {
+    display: grid; gap: 6px; padding-left: 18px; list-style: decimal;
+    font-size: 15px; line-height: 1.55; color: var(--color-steel);
+  }
+</style>

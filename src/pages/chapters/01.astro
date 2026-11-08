@@ -3,6 +3,8 @@
 // Text follows design/approved-mockup.html, corrected against the capstone's documents
 // (mainly project-context/1.define/mrd.md and prd.md). Visuals are added in the next PRs.
 import Chapter from '../../layouts/Chapter.astro';
+import Personas from '../../components/chapter01/Personas.astro';
+import JourneyMap from '../../components/chapter01/JourneyMap.astro';
 
 const toc = [
   { id: 'who-it-affects', label: 'Who it affects' },
@@ -32,7 +34,7 @@ const toc = [
       Two kinds of user are planned for the product. A third group sends most of the reports but
       isn’t a user in this version.
     </p>
-    <!-- PR E: the two early profiles, the outside firms, and "What I still need to check" -->
+    <Personas />
   </section>
 
   <section id="how-it-works-today">
@@ -41,7 +43,7 @@ const toc = [
       Today a human specialist’s work has five steps. Mistakes creep in at steps 2 and 3, where legal
       text is turned into deadlines.
     </p>
-    <!-- PR E: the five-step journey map -->
+    <JourneyMap />
   </section>
 
   <section id="documents-that-disagree">
