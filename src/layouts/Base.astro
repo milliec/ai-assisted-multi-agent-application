@@ -9,6 +9,7 @@ import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 
 import '../styles/global.css';
+import NavPill from '../components/NavPill.astro';
 
 interface Props {
   title: string;
@@ -31,7 +32,11 @@ const {
     <title>{title}</title>
   </head>
   <body>
+    <!-- Hidden until a keyboard user presses Tab: jumps past the header to the content -->
+    <a class="skip" href="#main">Skip to content</a>
     <slot />
+    <!-- The glass pill: the site's only navigation -->
+    <NavPill />
 
     <script>
       // Reveal on scroll: see the note in src/styles/global.css.

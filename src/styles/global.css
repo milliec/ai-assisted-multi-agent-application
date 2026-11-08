@@ -101,6 +101,13 @@
 }
 .ul:hover, .ul:focus-visible { background-size: 100% 2px; }
 
+/* "Skip to content" link: off screen until focused with the keyboard */
+.skip {
+  position: absolute; left: 16px; top: -60px; z-index: 200;
+  padding: 10px 16px; background: var(--color-graphite); color: #fff; text-decoration: none;
+}
+.skip:focus { top: 12px; }
+
 /* Chip: a small grey label, e.g. a report name. Usage: class="chip" */
 .chip {
   display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
