@@ -129,11 +129,32 @@
   transform: translateY(8px);
 }
 
+/* =====================================================================
+   Crossfade between pages
+   The browser's built-in "view transitions": when moving between pages of
+   this site, the old page fades into the new one instead of flashing white.
+   Supported in Chrome, Edge and Safari; other browsers simply change page
+   as normal. No JavaScript needed.
+   ===================================================================== */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+}
+
 /* Respect visitors who turned on "reduce motion" in their system settings */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+  /* No crossfade either: pages change instantly */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
