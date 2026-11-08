@@ -1,0 +1,138 @@
+---
+// Design system page: shows every token from src/styles/global.css,
+// so the look can be checked in the browser. The values below are for the
+// labels only; the swatches themselves use the real Tailwind classes.
+import Base from '../layouts/Base.astro';
+
+const colours = [
+  { name: 'Graphite', cls: 'bg-graphite', hex: '#202020', role: 'Main text, headings, primary buttons' },
+  { name: 'Steel', cls: 'bg-steel', hex: '#4d4d4d', role: 'Secondary text' },
+  { name: 'Slate', cls: 'bg-slate', hex: '#828282', role: 'Large text or decoration only (3.9:1)' },
+  { name: 'Brass', cls: 'bg-brass', hex: '#816729', role: 'Coloured text accent (5.4:1)' },
+  { name: 'Ember', cls: 'bg-ember', hex: '#ff682c', role: 'Lines and markers only, never text (2.9:1)' },
+  { name: 'Ivory', cls: 'bg-ivory', hex: '#ebe6dd', role: 'Warm featured bands' },
+  { name: 'Ash', cls: 'bg-ash', hex: '#efefef', role: 'Section bands' },
+  { name: 'Fog', cls: 'bg-fog', hex: '#f5f5f5', role: 'Nested surfaces' },
+  { name: 'Mist', cls: 'bg-mist', hex: '#e8e8e8', role: 'Hairline dividers' },
+  { name: 'Canvas white', cls: 'bg-canvas-white', hex: '#ffffff', role: 'Page background, data cards' },
+];
+
+const type = [
+  { name: 'Display', cls: 'text-display', spec: '66px · 0.91 · −0.02em', sample: 'Deadlines set by hand' },
+  { name: 'Heading large', cls: 'text-heading-lg', spec: '40px · 1.2 · −0.02em', sample: 'The short version' },
+  { name: 'Heading', cls: 'text-heading', spec: '32px · 1.19 · −0.02em', sample: 'One decision at a time' },
+  { name: 'Subheading', cls: 'text-subheading font-sans', spec: '18px · 1.25', sample: 'Investment funds must send regular reports to regulators.' },
+  { name: 'Caption', cls: 'text-caption font-sans', spec: '14px · 1.43', sample: 'Each deadline names who sends it.' },
+];
+
+const spacing = [
+  { px: 8, cls: 'w-2' }, { px: 12, cls: 'w-3' }, { px: 16, cls: 'w-4' }, { px: 20, cls: 'w-5' },
+  { px: 36, cls: 'w-9' }, { px: 40, cls: 'w-10' }, { px: 60, cls: 'w-15' }, { px: 140, cls: 'w-35' },
+];
+
+const radii = [
+  { name: 'Asymmetric card', cls: 'rounded-asym', value: '6px 0 0 0' },
+  { name: 'Card', cls: 'rounded-lg', value: '8px' },
+  { name: 'Data widget, tag', cls: 'rounded-2xl', value: '20px' },
+  { name: 'Pill', cls: 'rounded-pill', value: '200px' },
+  { name: 'Button', cls: 'rounded-none', value: '0' },
+];
+---
+
+<Base title="Design system · AI-Assisted Multi-Agent Application Development">
+  <main class="mx-auto max-w-[1200px] px-4 py-15 md:px-10">
+    <a href="/" class="font-display text-[13px] text-steel underline decoration-ember underline-offset-4">← Back to the cover</a>
+    <h1 class="mt-6 text-heading-lg">Design system</h1>
+    <p class="mt-3 max-w-[36em] text-subheading leading-[1.45] text-steel">
+      The tokens behind the case study. Colour is kept to warm greys and paper tones, with one orange
+      accent used only as a line or marker.
+    </p>
+
+    <!-- Colour -->
+    <section class="mt-15">
+      <h2 class="text-heading">Colour</h2>
+      <ul class="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
+        {colours.map((c) => (
+          <li>
+            <div class={`h-20 rounded-lg ring-1 ring-mist ${c.cls}`}></div>
+            <p class="mt-3 font-display text-[16px]">{c.name}</p>
+            <p class="font-mono text-[12px] text-steel">{c.hex}</p>
+            <p class="mt-1 text-[13px] leading-snug text-steel">{c.role}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Type -->
+    <section class="mt-20">
+      <h2 class="text-heading">Type</h2>
+      <p class="mt-2 text-caption text-steel">Inter Tight for headings (always weight 400), Inter for reading text, IBM Plex Mono for IDs and code.</p>
+      <ul class="mt-6 divide-y divide-mist border-y border-mist">
+        {type.map((t) => (
+          <li class="grid gap-2 py-6 md:grid-cols-[180px_1fr] md:items-baseline">
+            <div>
+              <p class="font-display text-[15px] text-brass">{t.name}</p>
+              <p class="font-mono text-[12px] text-steel">{t.spec}</p>
+            </div>
+            <p class={`font-display ${t.cls}`}>{t.sample}</p>
+          </li>
+        ))}
+        <li class="grid gap-2 py-6 md:grid-cols-[180px_1fr] md:items-baseline">
+          <div>
+            <p class="font-display text-[15px] text-brass">Mono</p>
+            <p class="font-mono text-[12px] text-steel">12–13px · IDs and code</p>
+          </div>
+          <p class="font-mono text-[13px]">OBL-01 · SRC-CSSF15627-P2 · FND-DEMO-01</p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Spacing -->
+    <section class="mt-20">
+      <h2 class="text-heading">Spacing</h2>
+      <p class="mt-2 text-caption text-steel">Every value is a multiple of the 4px base unit.</p>
+      <ul class="mt-6 space-y-3">
+        {spacing.map((s) => (
+          <li class="flex items-center gap-4">
+            <span class="w-14 font-mono text-[12px] text-steel">{s.px}px</span>
+            <span class={`h-3 bg-brass ${s.cls}`}></span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Radius -->
+    <section class="mt-20">
+      <h2 class="text-heading">Corners</h2>
+      <p class="mt-2 text-caption text-steel">Three shapes create the rhythm: sharp buttons, the soft-cornered signature card, round pills.</p>
+      <ul class="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-5">
+        {radii.map((r) => (
+          <li>
+            <div class={`h-20 bg-ash ${r.cls}`}></div>
+            <p class="mt-3 font-display text-[15px]">{r.name}</p>
+            <p class="font-mono text-[12px] text-steel">{r.value}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Components preview -->
+    <section class="mt-20 rounded-asym bg-ash p-6 md:p-10">
+      <h2 class="text-heading">Building blocks</h2>
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <button class="border border-graphite bg-graphite px-5 py-3 font-display text-[16px] tracking-[-0.02em] text-white transition-colors hover:bg-black">Start reading →</button>
+        <button class="border border-graphite px-5 py-3 font-display text-[16px] tracking-[-0.02em] transition-colors hover:bg-black/5">Read the short version</button>
+        <span class="inline-flex items-center gap-1.5 rounded-2xl bg-canvas-white px-2.5 py-1.5 text-[12px] font-medium text-steel"><i class="size-1.5 rounded-full bg-graphite"></i>Written</span>
+        <span class="inline-flex items-center gap-1.5 rounded-2xl bg-canvas-white px-2.5 py-1.5 text-[12px] font-medium text-steel"><i class="size-1.5 rounded-full bg-ember"></i>Build phase</span>
+        <span class="inline-flex items-center gap-1.5 rounded-2xl bg-ivory px-2.5 py-1.5 text-[12px] font-medium text-brass">⚑ Two sources disagree</span>
+      </div>
+      <div class="mt-6 max-w-md rounded-2xl bg-canvas-white p-6">
+        <p class="font-display text-[16px]">2027 reporting calendar</p>
+        <p class="mt-1 font-mono text-[12px] text-steel">Fictional fund · 22 deadlines</p>
+        <div class="mt-4 h-1 w-7 bg-ember"></div>
+        <p class="mt-4 font-display text-[44px] leading-none tracking-[-0.03em]">22</p>
+        <p class="mt-2 text-caption text-steel">deadlines in the answer key</p>
+      </div>
+    </section>
+  </main>
+</Base>

@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   Design tokens
+   Everything in @theme becomes both a CSS variable (e.g. var(--color-brass))
+   and a Tailwind class (e.g. text-brass, bg-ash). Change a value here and it
+   updates everywhere.
+   ===================================================================== */
+@theme {
+  /* ---------- Colour ---------- */
+  --color-graphite: #202020;     /* main text, headings, primary buttons */
+  --color-canvas-white: #ffffff; /* page background, data cards */
+  --color-ash: #efefef;          /* section bands */
+  --color-fog: #f5f5f5;          /* nested surfaces */
+  --color-ivory: #ebe6dd;        /* warm featured bands */
+  --color-ivory-line: #ddd6c9;   /* hairline on ivory */
+  --color-steel: #4d4d4d;        /* secondary text */
+  --color-slate: #828282;        /* 3.9:1 on white: only for 18px+ text or decoration */
+  --color-mist: #e8e8e8;         /* hairline dividers */
+  --color-ember: #ff682c;        /* 2.9:1 on white: NEVER as text. Lines, dots, markers only */
+  --color-brass: #816729;        /* 5.4:1 on white: the coloured text accent */
+
+  /* ---------- Fonts ----------
+     Display replaces the licensed PolySans with Inter Tight, always at weight 400.
+     All three fonts are self-hosted (see src/layouts/Base.astro). */
+  --font-display: "Inter Tight Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ---------- Type scale (size, line height, tracking) ---------- */
+  --text-caption: 14px;
+  --text-caption--line-height: 1.43;
+  --text-subheading: 18px;
+  --text-subheading--line-height: 1.25;
+  --text-heading: 32px;
+  --text-heading--line-height: 1.19;
+  --text-heading--letter-spacing: -0.02em;
+  --text-heading-lg: 40px;
+  --text-heading-lg--line-height: 1.2;
+  --text-heading-lg--letter-spacing: -0.02em;
+  --text-display: 66px;
+  --text-display--line-height: 0.91;
+  --text-display--letter-spacing: -0.02em;
+
+  /* ---------- Spacing ----------
+     Base unit 4px. The design system's scale (8, 12, 16, 20, 36, 40, 60, 140)
+     maps straight onto Tailwind's numbers: p-2 = 8px, p-3 = 12px, p-4 = 16px,
+     p-5 = 20px, p-9 = 36px, p-10 = 40px, p-15 = 60px, p-35 = 140px. */
+  --spacing: 4px;
+
+  /* ---------- Radius ---------- */
+  --radius-sm: 3px;
+  --radius-lg: 8px;    /* cards */
+  --radius-xl: 12px;
+  --radius-2xl: 20px;  /* data widgets, tags */
+  --radius-pill: 200px;
+
+  /* ---------- Motion ---------- */
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* The signature card shape: soft top-left corner, sharp everywhere else.
+   Usage: class="rounded-asym" */
+@utility rounded-asym {
+  border-radius: 6px 0 0 0;
+}
+
+/* =====================================================================
+   Base styles
+   ===================================================================== */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-canvas-white);
+    color: var(--color-graphite);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Headings: display face, weight 400, tight tracking. Never bold. */
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-graphite);
+    outline-offset: 3px;
+  }
+}
+
+/* Respect visitors who turned on "reduce motion" in their system settings */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

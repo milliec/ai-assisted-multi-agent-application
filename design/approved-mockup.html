@@ -1,0 +1,1430 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regulatory Intelligence · Case study mockup v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   1. TOKENS (from tokens.json / theme.css / the design system)
+   ============================================================ */
+:root {
+  --graphite:#202020; --white:#ffffff; --ash:#efefef; --fog:#f5f5f5; --ivory:#ebe6dd;
+  --steel:#4d4d4d; --slate:#828282; --mist:#e8e8e8; --ember:#ff682c; --brass:#816729;
+  --ivory-line:#ddd6c9;              /* hairline on ivory (derived) */
+
+  --font-display:'Inter Tight', ui-sans-serif, system-ui, sans-serif;  /* PolySans substitute */
+  --font-body:'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+  --r-asym:6px 0 0 0;   /* signature card */
+  --r-data:20px;        /* data widgets, tags */
+  --r-card:8px;
+  --r-pill:200px;
+
+  --max:1200px; --gutter:40px; --section:80px;   /* the design system: 80px section gap */
+  --gap:20px;                                     /* the design system: 20px element gap */
+
+  --ease:cubic-bezier(.2,.7,.2,1); --fast:160ms; --med:320ms;
+}
+@media (max-width:720px){ :root{ --gutter:16px; --section:56px; } }
+
+/* ============================================================
+   2. BASE
+   ============================================================ */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body{ margin:0; background:var(--white); color:var(--graphite); font:400 16px/1.5 var(--font-body); -webkit-font-smoothing:antialiased; }
+p{ margin:0 0 1em; }
+h1,h2,h3,h4{ font-family:var(--font-display); font-weight:400; letter-spacing:-0.02em; margin:0; }
+svg{ display:block; max-width:100%; }
+.wrap{ max-width:var(--max); margin:0 auto; padding:0 var(--gutter); }
+.mono{ font-family:var(--font-mono); font-size:12px; letter-spacing:0; }
+.sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+:focus-visible{ outline:2px solid var(--graphite); outline-offset:3px; }
+.skip{ position:absolute; left:16px; top:-60px; background:var(--graphite); color:#fff; padding:10px 16px; z-index:200; }
+.skip:focus{ top:12px; }
+
+/* Surfaces: sections separated by alternating bands, not lines */
+.band{ padding:var(--section) 0; }
+.band-ash{ background:var(--ash); }
+.band-ivory{ background:var(--ivory); }
+
+/* Caption style from the partner-strip pattern: display face 13px in brass */
+.kicker{ font:400 13px/1.38 var(--font-display); letter-spacing:-0.01em; color:var(--brass); margin:0 0 14px; }
+.bracket{ font-family:var(--font-mono); color:var(--brass); }
+
+/* Link with ember underline (accent used only as a line) */
+.ul{ color:inherit; text-decoration:none; padding-bottom:2px;
+  background:linear-gradient(var(--ember),var(--ember)) left bottom/100% 1px no-repeat;
+  transition:background-size var(--med) var(--ease); }
+.ul:hover,.ul:focus-visible{ background-size:100% 2px; }
+
+/* Buttons: 0 radius, display face 16px */
+.btn{ display:inline-flex; align-items:center; gap:8px; font:400 16px/1 var(--font-display); letter-spacing:-0.02em;
+  padding:12px 20px; border:1px solid var(--graphite); border-radius:0; cursor:pointer; text-decoration:none;
+  transition:background var(--fast) var(--ease), transform var(--fast) var(--ease); }
+.btn:active{ transform:translateY(1px); }
+.btn-primary{ background:var(--graphite); color:#fff; }
+.btn-primary:hover{ background:#000; }
+.btn-ghost{ background:transparent; color:var(--graphite); }
+.btn-ghost:hover{ background:rgba(0,0,0,.04); }
+.btn-sm{ font-size:14px; padding:8px 14px; }
+.btn[disabled]{ border-color:var(--mist); background:var(--fog); color:var(--slate); cursor:not-allowed; }
+
+/* Tags: 20px radius */
+.tag{ display:inline-flex; align-items:center; gap:6px; font:500 12px/1 var(--font-body); color:var(--steel);
+  background:var(--white); border-radius:var(--r-data); padding:6px 10px; white-space:nowrap; }
+.tag i{ width:6px; height:6px; border-radius:50%; background:var(--graphite); }
+.tag.t-build i{ background:var(--ember); }
+.tag.t-collect i{ background:var(--brass); }
+.tag.t-plan i{ background:transparent; box-shadow:inset 0 0 0 1px var(--slate); }
+.chip{ display:inline-flex; align-items:center; gap:6px; font:500 12px/1 var(--font-body); padding:5px 9px;
+  border-radius:var(--r-data); background:var(--fog); color:var(--graphite); white-space:nowrap; }
+.chip.ok::before{ content:"✓"; font-size:11px; }
+.chip.flag{ background:var(--ivory); color:var(--brass); }
+.chip.flag::before{ content:"⚑"; font-size:11px; }
+
+/* Data card: white, 20px radius, no shadow */
+.dcard{ background:var(--white); border-radius:var(--r-data); padding:24px; }
+
+/* ============================================================
+   3. HEADER (wordmark only) + FOOTER
+   ============================================================ */
+.site-header .wrap{ display:flex; justify-content:space-between; align-items:center; height:84px; }
+.wordmark{ color:var(--graphite); text-decoration:none; display:flex; flex-direction:column; line-height:1.15; }
+.wordmark b{ font:400 18px var(--font-display); letter-spacing:-0.02em; }
+.wordmark span{ font-size:12px; color:var(--steel); }
+.site-header .where{ font:400 13px var(--font-display); color:var(--steel); }
+@media (max-width:600px){ .site-header .where{ display:none; } }
+
+.site-footer{ background:var(--graphite); color:#cfcfcf; padding:64px 0 140px; }
+.site-footer .wrap{ display:flex; justify-content:space-between; align-items:end; gap:24px; flex-wrap:wrap; }
+.site-footer h2{ font-size:32px; color:#fff; line-height:1.2; max-width:14em; }
+.site-footer .links{ display:flex; gap:28px; font:400 18px var(--font-display); }
+.site-footer .links a{ color:#fff; }
+
+/* ============================================================
+   4. BOTTOM NAVIGATION PILL (the only navigation)
+   ============================================================ */
+.navpill{ position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:80;
+  display:flex; align-items:center; gap:2px; border-radius:var(--r-pill); padding:5px;
+  /* Glass: see-through white that blurs and brightens what's behind it */
+  background:rgba(255,255,255,.72);
+  -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid rgba(255,255,255,.75);
+  /* Deliberate exception to "no shadows": a floating control needs lift to separate from every background */
+  box-shadow:0 0 0 .5px rgba(32,32,32,.14), 0 10px 30px -6px rgba(32,32,32,.18), inset 0 1px 0 rgba(255,255,255,.9); }
+/* Fallbacks: no blur support, or the visitor asked for less transparency */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .navpill, .chmenu{ background:#fff; } }
+@media (prefers-reduced-transparency:reduce){ .navpill, .chmenu{ background:#fff; -webkit-backdrop-filter:none; backdrop-filter:none; } }
+.navpill button{ position:relative; background:none; border:0; color:var(--graphite); cursor:pointer;
+  font:400 15px/1 var(--font-display); letter-spacing:-0.02em; padding:11px 16px; border-radius:var(--r-pill);
+  display:inline-flex; align-items:center; gap:8px; white-space:nowrap; transition:background var(--fast) var(--ease); }
+.navpill button:hover{ background:rgba(255,255,255,.55); }
+.navpill button[aria-current="page"], .navpill button[aria-pressed="true"], .navpill button[aria-expanded="true"]{ background:rgba(255,255,255,.95); box-shadow:0 1px 3px rgba(32,32,32,.10), 0 0 0 .5px rgba(32,32,32,.06); }
+.navpill .sep{ width:1px; height:18px; background:rgba(32,32,32,.14); margin:0 4px; }
+.navpill .caret{ font-size:9px; transition:transform var(--fast) var(--ease); }
+.navpill [aria-expanded="true"] .caret{ transform:rotate(180deg); }
+.navpill .pin-dot{ width:8px; height:8px; border-radius:50%; box-shadow:inset 0 0 0 1.5px var(--brass); }
+.navpill [aria-pressed="true"] .pin-dot{ background:var(--brass); }
+.navprog{ position:absolute; left:24px; right:24px; bottom:2px; height:2px; overflow:hidden; pointer-events:none; }
+.navprog i{ display:block; height:100%; width:100%; background:var(--ember); transform-origin:left; transform:scaleX(var(--p,0)); opacity:0; transition:opacity var(--med); }
+body[data-view^="ch"] .navprog i{ opacity:1; }
+@media (max-width:420px){ .navpill button{ padding:10px 11px; font-size:14px; } }
+
+.chmenu{ position:fixed; left:50%; bottom:78px; transform:translate(-50%,8px); z-index:81; width:min(440px, calc(100vw - 32px));
+  border-radius:var(--r-data); padding:10px;
+  background:rgba(255,255,255,.78); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,.8);
+  box-shadow:0 0 0 .5px rgba(32,32,32,.14), 0 16px 40px -10px rgba(32,32,32,.22), inset 0 1px 0 rgba(255,255,255,.9);
+  opacity:0; visibility:hidden; transition:opacity var(--fast) var(--ease), transform var(--fast) var(--ease), visibility 0s linear var(--fast); }
+.chmenu.open{ opacity:1; visibility:visible; transform:translate(-50%,0); transition-delay:0s; }
+.chmenu p{ font:400 13px var(--font-display); color:var(--brass); margin:8px 12px; }
+.chmenu ol{ list-style:none; margin:0; padding:0; }
+.chmenu a, .chmenu .off{ display:grid; grid-template-columns:40px 1fr auto; gap:8px; align-items:center; padding:10px 12px; border-radius:12px; color:var(--graphite); text-decoration:none; font:400 15px var(--font-display); }
+.chmenu a:hover, .chmenu a:focus-visible{ background:rgba(255,255,255,.7); }
+.chmenu a[aria-current="page"]{ background:var(--ivory); }
+.chmenu .off{ color:var(--slate); }
+.chmenu .n{ font:400 12px var(--font-mono); color:var(--brass); }
+.chmenu .off .n{ color:var(--slate); }
+.chmenu .s{ font:500 11px var(--font-body); color:var(--steel); }
+
+/* ============================================================
+   5. COVER
+   ============================================================ */
+.hero{ padding:40px 0 var(--section); }
+.hero-grid{ display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+@media (max-width:980px){ .hero-grid{ grid-template-columns:1fr; gap:40px; } }
+.hero h1{ font-size:clamp(38px,4.5vw,56px); line-height:.98; letter-spacing:-0.02em; margin:0 0 28px; }
+.lede{ font-size:18px; line-height:1.45; color:var(--steel); max-width:32em; }
+.hero-cta{ display:flex; gap:12px; flex-wrap:wrap; margin-top:32px; }
+.facts{ display:grid; grid-template-columns:1fr 150px; row-gap:24px; gap:var(--gap); margin:48px 0 0; }
+.facts dt{ font:400 13px var(--font-display); color:var(--brass); margin-bottom:6px; }
+.facts dd{ margin:0; font-size:14px; line-height:1.43; }
+@media (max-width:640px){ .facts{ grid-template-columns:1fr; } }
+.stack{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
+.stack li{ font:500 12px/1 var(--font-body); background:var(--fog); border-radius:var(--r-data); padding:6px 9px; white-space:nowrap; }
+.stack li span{ font-weight:400; color:var(--steel); margin-left:4px; }
+.phases{ display:flex; gap:3px; margin:2px 0 8px; max-width:150px; }
+.phases span{ flex:1; height:4px; background:#d9d9d9; }
+.phases .done{ background:var(--graphite); }
+
+/* Hero cluster: three overlapping data cards on an ivory sheet */
+.sheet{ background:var(--ivory); border-radius:var(--r-asym); padding:56px 60px 64px; }
+@media (max-width:720px){ .sheet{ padding:16px; } }
+.cluster{ display:grid; grid-template-columns:1fr 1fr; }
+.c-cal{ grid-column:1/-1; padding:24px 24px 96px; }
+.c-ring, .c-flag{ margin-top:-72px; position:relative; box-shadow:0 0 0 1px var(--ivory-line); }
+.c-ring{ grid-column:2; grid-row:2; margin-left:10px; margin-right:-28px; z-index:2; }
+.c-flag{ grid-column:1; grid-row:2; margin-left:-28px; margin-right:10px; z-index:3; }
+@media (max-width:720px){ .cluster{ grid-template-columns:1fr; gap:10px; } .c-cal{ padding-bottom:24px; } .c-ring,.c-flag{ grid-column:1; grid-row:auto; margin:0; } }
+.card-h{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+.card-h h3{ font-size:16px; line-height:1.2; }
+.card-h .mono{ color:var(--steel); }
+.legend{ display:flex; gap:6px 14px; flex-wrap:wrap; margin-top:10px; font-size:11px; color:var(--steel); }
+.legend i{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
+.dot{ transform-box:fill-box; transform-origin:center; }
+.anim .dot{ opacity:0; transform:scale(.3); animation:dotIn 420ms var(--ease) forwards; }
+@keyframes dotIn{ to{ opacity:1; transform:scale(1); } }
+.ring-row{ display:flex; gap:14px; align-items:center; }
+.ring-row b{ display:block; font:400 26px/1 var(--font-display); letter-spacing:-0.02em; margin-bottom:4px; }
+.small{ font-size:13px; line-height:1.4; color:var(--steel); margin:0; }
+.ring-arc{ transition:stroke-dashoffset 1100ms var(--ease) 500ms; }
+.bars{ display:grid; gap:9px; margin-top:12px; }
+.bar{ display:grid; grid-template-columns:1fr 34px; gap:4px 8px; align-items:center; font-size:11px; color:var(--steel); }
+.bar .lbl{ grid-column:1/-1; }
+.bar .track{ height:6px; background:var(--fog); border-radius:3px; overflow:hidden; }
+.bar .track i{ display:block; height:100%; border-radius:3px; width:0; transition:width 900ms var(--ease) 700ms; }
+.bar.law .track i{ background:var(--brass); }
+.bar.note .track i{ background:var(--slate); }
+.grown .bar.law .track i{ width:100%; }
+.grown .bar.note .track i{ width:66.6%; }
+.bar b{ font-weight:500; color:var(--graphite); text-align:right; font-variant-numeric:tabular-nums; }
+
+/* Short version */
+.inshort{ display:grid; grid-template-columns:320px 1fr; gap:60px; }
+@media (max-width:900px){ .inshort{ grid-template-columns:1fr; gap:24px; } }
+.inshort h2{ font-size:40px; line-height:1.1; }
+.short-list{ list-style:none; margin:0; padding:0; display:grid; gap:24px; }
+.short-list li{ display:grid; grid-template-columns:44px 1fr; gap:12px; font-size:17px; line-height:1.55; color:var(--steel); }
+.short-list li .bracket{ font-size:13px; padding-top:4px; }
+.short-list strong{ color:var(--graphite); font-weight:500; }
+.stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--gap); margin-top:64px; }
+@media (max-width:860px){ .stats{ grid-template-columns:1fr 1fr; } }
+.stat{ background:var(--white); border-radius:var(--r-data); padding:28px 24px; }
+.stat b{ display:block; font:400 clamp(44px,4.6vw,60px)/1 var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums; margin-bottom:14px; }
+.stat b small{ font-size:.38em; letter-spacing:0; margin-left:4px; }
+.stat span{ font-size:14px; line-height:1.43; color:var(--steel); display:block; }
+.stat .rule{ display:block; height:2px; width:0; background:var(--ember); margin-bottom:22px; transition:width 700ms var(--ease); }
+.stat.in .rule{ width:28px; }
+
+/* Team strip (adapts the partner-logo strip) */
+.team-intro{ display:grid; grid-template-columns:320px 1fr; gap:60px; align-items:start; }
+@media (max-width:900px){ .team-intro{ grid-template-columns:1fr; gap:16px; } }
+.team-intro h2{ font-size:32px; line-height:1.19; }
+.team-intro p{ font-size:17px; line-height:1.6; color:var(--steel); max-width:36em; margin:0; }
+.team-intro strong{ color:var(--graphite); font-weight:500; }
+.phase-rows{ margin-top:40px; display:grid; gap:10px; }
+.phase-row{ display:grid; grid-template-columns:120px 1fr; gap:20px; align-items:center; background:var(--fog); border-radius:var(--r-card); padding:14px 18px; }
+@media (max-width:640px){ .phase-row{ grid-template-columns:1fr; gap:10px; } }
+.phase-row h3{ font-size:16px; }
+.personas{ display:flex; flex-wrap:wrap; gap:8px; }
+.persona{ display:inline-flex; align-items:center; gap:8px; font:400 15px/1 var(--font-display); letter-spacing:-0.01em; background:var(--white); padding:9px 12px; border-radius:var(--r-data); }
+.persona svg{ width:15px; height:15px; }
+.persona em{ font:500 11px var(--font-body); font-style:normal; color:var(--steel); }
+.persona.used em{ color:var(--brass); }
+.persona.later{ color:var(--steel); }
+
+/* Chapter index */
+.index-head{ display:flex; justify-content:space-between; align-items:end; gap:16px; flex-wrap:wrap; margin-bottom:28px; }
+.index-head h2{ font-size:40px; }
+.chapters{ list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.ch{ display:grid; grid-template-columns:64px 1fr auto 28px; gap:20px; align-items:center; padding:22px 24px; border-radius:var(--r-card); color:inherit; text-decoration:none; background:rgba(255,255,255,.55); transition:background var(--fast) var(--ease); }
+a.ch:hover, a.ch:focus-visible{ background:var(--white); }
+.ch .n{ font:400 13px var(--font-mono); color:var(--brass); }
+.ch h3{ font-size:24px; line-height:1.2; margin-bottom:4px; }
+.ch p{ margin:0; font-size:15px; color:var(--steel); }
+.ch .arrow{ font:400 20px var(--font-display); transition:transform var(--fast) var(--ease); }
+a.ch:hover .arrow{ transform:translateX(4px); }
+div.ch{ background:transparent; }
+div.ch h3{ color:var(--steel); }
+@media (max-width:720px){ .ch{ grid-template-columns:36px 1fr; padding:18px 14px; } .ch .tag{ grid-column:2; justify-self:start; } .ch .arrow{ display:none; } }
+
+/* ============================================================
+   6. CHAPTER PAGES
+   ============================================================ */
+.ch-hero{ background:var(--ivory); padding:56px 0 64px; }
+.crumbs{ font:400 13px var(--font-display); color:var(--steel); display:flex; gap:8px; }
+.crumbs a{ color:var(--steel); }
+.ch-hero h1{ font-size:clamp(40px,5.4vw,66px); line-height:.95; margin:24px 0; max-width:13em; }
+.ch-hero .lede{ max-width:36em; }
+.ch-hero .wrap{ display:grid; grid-template-columns:minmax(0,1fr) 280px; column-gap:60px; }
+.ch-hero .wrap > *:not(.glance){ grid-column:1; }
+.glance{ grid-column:2; grid-row:1 / span 4; align-self:end; margin:0; background:var(--white); border-radius:var(--r-data); padding:8px 24px; }
+.glance > div{ display:grid; grid-template-columns:64px 1fr; gap:12px; align-items:baseline; padding:16px 0; border-top:1px solid var(--fog); }
+.glance > div:first-child{ border-top:0; }
+.glance dt{ font:400 40px/1 var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums; }
+.glance dd{ margin:0; font-size:14px; line-height:1.4; color:var(--steel); }
+@media (max-width:900px){ .ch-hero .wrap{ grid-template-columns:1fr; } .glance{ grid-column:1; grid-row:auto; margin-top:32px; } }
+.ch-meta{ display:flex; gap:28px; flex-wrap:wrap; margin-top:28px; font-size:13px; color:var(--steel); }
+.ch-meta b{ font-weight:500; color:var(--graphite); margin-left:6px; }
+
+.reader{ display:grid; grid-template-columns:190px minmax(0,1fr); gap:56px; padding-top:72px; padding-bottom:var(--section); }
+@media (max-width:1140px){ .reader{ grid-template-columns:180px minmax(0,1fr); gap:44px; } .margin-col{ display:none; } }
+@media (max-width:860px){ .reader{ grid-template-columns:minmax(0,1fr); } .toc{ display:none; } }
+
+/* Sticky contents. Nothing else may set `position` on this element. */
+.toc{ position:sticky; top:32px; align-self:start; font-size:14px; }
+.toc ol{ list-style:none; margin:0; padding:0; position:relative; border-left:1px solid var(--mist); }
+.toc ol::before{ content:""; position:absolute; left:-1px; top:0; width:1px; height:calc(var(--p,0)*100%); background:var(--graphite); }
+.toc a{ display:grid; grid-template-columns:30px 1fr; padding:7px 0 7px 14px; color:var(--steel); text-decoration:none; position:relative; line-height:1.35; transition:color var(--fast) var(--ease); }
+.toc a .mono{ font-size:11px; color:var(--slate); padding-top:2px; }
+.toc a:hover, .toc a.active{ color:var(--graphite); }
+.toc a::before{ content:""; position:absolute; left:-2px; top:6px; bottom:6px; width:3px; background:var(--ember); transform:scaleY(0); transition:transform var(--med) var(--ease); }
+.toc a.active::before{ transform:scaleY(1); }
+
+.article section{ scroll-margin-top:32px; margin-bottom:104px; }
+.article h2{ font-size:32px; line-height:1.19; margin-bottom:20px; display:flex; gap:14px; align-items:baseline; }
+.article h2 .mono{ font-size:13px; color:var(--brass); }
+.article p{ font-size:17px; line-height:1.65; color:var(--steel); }
+.article p strong{ color:var(--graphite); font-weight:500; }
+.article .first{ color:var(--graphite); font-size:19px; line-height:1.55; }
+.article .small{ font-size:13px; line-height:1.4; }
+.caption{ font-size:13px !important; line-height:1.45 !important; color:var(--steel); margin-top:12px; }
+
+.margin-col{ position:relative; }
+.mnote{ position:absolute; width:190px; font-size:12px; line-height:1.45; color:var(--steel); }
+.mnote .mono{ display:block; font-size:11px; color:var(--brass); margin-bottom:4px; }
+.inline-note{ display:none; }
+@media (max-width:1140px){ .inline-note{ display:block; font-size:13px; color:var(--steel); border-left:2px solid var(--ivory); padding-left:12px; margin:-4px 0 20px; } .inline-note .mono{ color:var(--brass); font-size:11px; } }
+
+/* Stage: ash signature panel that holds visuals and demos */
+/* Text keeps a comfortable line length (~70 characters); visuals and demos use the full column */
+.article section > h2, .article section > p, .article .caption, .article .validate, .article blockquote.pull{ max-width:680px; }
+/* On phones, visual panels run edge to edge */
+@media (max-width:860px){ .wide{ margin-left:calc(var(--gutter)*-1); margin-right:calc(var(--gutter)*-1); } }
+/* Only top/bottom margins here, so .wide and .wider can set the sides */
+.stage{ background:var(--ash); border-radius:var(--r-asym); padding:40px; margin-top:32px; margin-bottom:32px; }
+@media (max-width:720px){ .stage{ padding:16px; } }
+.stage-label{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.stage-label .kicker{ margin:0; }
+
+/* ---------- Chapter 01 visuals ---------- */
+.pnote{ display:flex; gap:10px; align-items:baseline; font-size:13px; color:var(--brass); margin:0 0 16px; }
+.persona-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--gap); }
+@media (max-width:760px){ .persona-grid{ grid-template-columns:1fr; } }
+.pcard{ background:var(--white); border-radius:var(--r-data); padding:28px; }
+.pcard .who{ display:flex; gap:14px; align-items:center; margin-bottom:18px; }
+.pcard .glyph{ width:44px; height:44px; border-radius:50%; background:var(--ivory); display:grid; place-items:center; flex:none; }
+.pcard h3{ font-size:22px; line-height:1.15; }
+.pcard .role{ font-size:13px; color:var(--steel); }
+.pcard h4{ font:400 13px var(--font-display); color:var(--brass); margin:18px 0 8px; }
+.pcard ul{ margin:0; padding:0; list-style:none; display:grid; gap:8px; }
+.pcard li{ font-size:14px; line-height:1.45; position:relative; padding-left:16px; }
+.pcard li::before{ content:""; position:absolute; left:2px; top:.6em; width:5px; height:5px; border-radius:50%; background:var(--brass); }
+.pcard li .mono{ color:var(--steel); font-size:11px; padding-top:2px; }
+.pcard .today{ font-size:14px !important; line-height:1.5 !important; color:var(--steel); margin:0; }
+.filers{ margin-top:var(--gap); background:var(--white); border-radius:var(--r-data); padding:20px 24px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:16px; align-items:center; }
+@media (max-width:640px){ .filers{ grid-template-columns:1fr; } }
+.filers b{ font:400 16px var(--font-display); }
+.filers .chips{ display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; }
+@media (max-width:640px){ .filers .chips{ justify-content:flex-start; } }
+.validate{ border-left:2px solid var(--ember); padding:4px 0 4px 20px; }
+.validate h4{ font:400 18px var(--font-display); margin-bottom:10px; }
+.validate ol{ margin:0; padding-left:18px; font-size:15px; line-height:1.55; color:var(--steel); display:grid; gap:6px; }
+
+.jmap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.jgrid{ display:grid; grid-template-columns:112px repeat(5,minmax(128px,1fr)); min-width:760px; background:var(--white); border-radius:var(--r-data); overflow:hidden; }
+.jgrid > div{ padding:14px; font-size:13px; line-height:1.45; color:var(--steel); border-top:1px solid var(--fog); }
+.jgrid .rh{ font:400 13px var(--font-display); color:var(--brass); border-right:1px solid var(--fog); }
+.jgrid .stg{ border-top:0; padding-top:20px; }
+.jgrid .stg .mono{ display:block; color:var(--brass); font-size:11px; margin-bottom:6px; }
+.jgrid .stg b{ display:block; font:400 16px/1.2 var(--font-display); letter-spacing:-0.01em; color:var(--graphite); }
+.jgrid .pain{ color:var(--graphite); }
+.jgrid .err{ display:flex; align-items:center; gap:8px; }
+.jgrid .err i{ width:10px; height:10px; border-radius:50%; background:var(--ember); flex:none; }
+.jgrid .err.no i{ background:transparent; box-shadow:inset 0 0 0 1px #cfcfcf; }
+.jgrid .opp{ background:#faf8f4; color:var(--graphite); }
+.scroll-hint{ display:none; font-size:12px; color:var(--steel); margin:8px 0 0; }
+@media (max-width:980px){ .scroll-hint{ display:block; } }
+
+.dumb{ background:var(--white); border-radius:var(--r-data); padding:28px; }
+.drow{ display:grid; grid-template-columns:190px 1fr; gap:24px; align-items:center; padding:18px 0; border-top:1px solid var(--fog); }
+.drow:first-child{ border-top:0; padding-top:4px; }
+@media (max-width:640px){ .drow{ grid-template-columns:1fr; gap:10px; } }
+.drow .name{ font:400 16px/1.25 var(--font-display); letter-spacing:-0.01em; }
+.drow .name small{ display:block; font:400 12px var(--font-body); color:var(--steel); margin-top:3px; }
+.track2{ position:relative; height:48px; margin:0 18px; }
+.track2 .axis{ position:absolute; left:0; right:0; top:24px; height:1px; background:var(--mist); }
+.track2 .span{ position:absolute; top:23px; height:3px; background:var(--ember); left:var(--a); width:0; transition:width 900ms var(--ease) 200ms; }
+.in .track2 .span{ width:calc(var(--b) - var(--a)); }
+.track2 .pt{ position:absolute; top:18px; width:13px; height:13px; border-radius:50%; transform:translateX(-50%); background:var(--white); box-shadow:inset 0 0 0 2px var(--graphite); }
+.track2 .pt.b{ background:var(--brass); box-shadow:none; }
+.track2 .pl{ position:absolute; top:-2px; transform:translateX(-50%); font:500 12px var(--font-body); color:var(--graphite); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.track2 .ax{ position:absolute; top:34px; font:400 10px var(--font-mono); color:var(--slate); transform:translateX(-50%); }
+.textcmp{ display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; font-size:14px; }
+.textcmp span{ background:var(--fog); border-radius:var(--r-card); padding:10px 12px; }
+.textcmp em{ font-style:normal; color:var(--brass); font-size:18px; }
+
+.layers{ display:grid; gap:6px; }
+.layer{ display:grid; grid-template-columns:1fr auto; gap:16px; align-items:center; padding:16px 20px; border-radius:var(--r-card); background:var(--white); }
+.layer:first-child{ border-radius:var(--r-asym); }
+.layer h4{ font:400 16px var(--font-display); letter-spacing:-0.01em; margin-bottom:2px; }
+.layer p{ font-size:13px !important; line-height:1.4 !important; margin:0 !important; }
+.layer .chips{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+.layer .none{ font-size:12px; color:var(--steel); }
+@media (max-width:640px){ .layer{ grid-template-columns:1fr; } .layer .chips{ justify-content:flex-start; } }
+
+/* ---------- Chapter 02 visuals ---------- */
+.objects{ display:grid; grid-template-columns:repeat(4,1fr); gap:28px; }
+@media (max-width:760px){ .objects{ grid-template-columns:1fr; gap:26px; } }
+.obj{ background:var(--white); border-radius:var(--r-card); padding:16px; position:relative; box-shadow:inset 0 0 0 1px transparent; transition:box-shadow var(--fast) var(--ease); outline:none; }
+.obj:hover, .obj:focus-visible{ box-shadow:inset 0 0 0 1px var(--graphite); }
+.obj:not(:last-child)::after{ content:"→"; position:absolute; right:-21px; top:16px; color:var(--slate); font:400 16px var(--font-display); transition:color var(--fast), transform var(--fast) var(--ease); }
+.obj:hover::after, .obj:focus-visible::after{ color:var(--graphite); transform:translateX(3px); }
+@media (max-width:760px){ .obj:not(:last-child)::after{ content:"↓"; right:auto; left:18px; top:auto; bottom:-24px; } }
+.obj .k{ font:400 13px var(--font-display); color:var(--brass); }
+.obj .mono{ display:block; margin:8px 0; color:var(--graphite); word-break:break-all; }
+.obj .by{ font-size:12px !important; line-height:1.4 !important; color:var(--steel); margin:0 0 10px !important; }
+.states{ display:flex; flex-wrap:wrap; gap:4px; }
+.states span{ font:500 11px/1 var(--font-body); padding:4px 7px; border-radius:var(--r-data); background:var(--fog); color:var(--steel); }
+
+.table-wrap{ overflow-x:auto; border-radius:var(--r-data); }
+table.perm{ width:100%; border-collapse:collapse; font-size:14px; min-width:560px; background:var(--white); }
+.perm th,.perm td{ text-align:left; padding:12px 14px; border-bottom:1px solid var(--fog); vertical-align:top; }
+.perm thead th{ font:400 13px var(--font-display); color:var(--brass); border-bottom:1px solid var(--mist); padding-top:16px; }
+.perm tbody th{ font-weight:400; }
+.perm td{ color:var(--steel); }
+.perm tbody tr{ transition:background var(--fast); }
+.perm tbody tr:hover{ background:#faf9f6; }
+.perm tbody tr:last-child th, .perm tbody tr:last-child td{ border-bottom:0; }
+.perm .never{ color:var(--graphite); font-weight:500; white-space:nowrap; }
+.perm .never::before{ content:"⊘ "; color:var(--ember); font-weight:400; }
+.perm .dec{ color:var(--graphite); font-weight:500; }
+.perm .na{ color:#bdbdbd; }
+
+blockquote.pull{ margin:40px 0 0; padding:0 0 0 24px; border-left:2px solid var(--ember); font:400 26px/1.3 var(--font-display); letter-spacing:-0.02em; color:var(--graphite); }
+blockquote.pull cite{ display:block; margin-top:12px; font:400 13px var(--font-body); color:var(--steel); font-style:normal; }
+
+/* Gate demo */
+.gate{ background:var(--white); border-radius:var(--r-data); overflow:hidden; }
+.gate-head{ padding:22px 24px 16px; border-bottom:1px solid var(--fog); }
+.gate-head .r1{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; }
+.gate-head h3{ font-size:20px; }
+.gate-head .count{ font-size:14px; color:var(--steel); font-variant-numeric:tabular-nums; }
+.segs{ display:flex; gap:4px; margin:14px 0 8px; }
+.segs span{ flex:1; height:6px; border-radius:3px; background:var(--fog); transition:background var(--med) var(--ease); }
+.segs span.on{ background:var(--graphite); }
+.g-row{ display:grid; grid-template-columns:1fr auto; gap:20px; padding:20px 24px; border-bottom:1px solid var(--fog); transition:background var(--med) var(--ease); }
+@media (max-width:720px){ .g-row{ grid-template-columns:1fr; padding:18px 16px; } }
+.g-head{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; margin-bottom:4px; }
+.g-title{ font:400 17px/1.3 var(--font-display); letter-spacing:-0.01em; }
+.g-meta{ font-size:13px; color:var(--steel); margin-bottom:10px; }
+.g-ver{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:13px; }
+.linkbtn{ background:none; border:0; padding:0; font:500 13px var(--font-body); color:var(--graphite); cursor:pointer; text-decoration:underline; text-decoration-color:var(--mist); text-underline-offset:3px; transition:text-decoration-color var(--fast); }
+.linkbtn:hover{ text-decoration-color:var(--ember); }
+.g-actions{ display:flex; gap:6px; align-items:flex-start; }
+.g-state{ font:500 12px/1 var(--font-body); padding:5px 9px; border-radius:var(--r-data); background:var(--fog); color:var(--steel); display:inline-flex; gap:6px; align-items:center; }
+.g-row[data-state="approved"] .g-state{ background:var(--graphite); color:#fff; }
+.g-row[data-state="rejected"] .g-state{ background:var(--ivory); color:var(--brass); }
+.g-row[data-state="rejected"] .g-title, .g-row[data-state="rejected"] .g-meta{ color:var(--slate); }
+.g-row.flash{ background:#fbfaf7; }
+.source{ background:var(--fog); border-radius:var(--r-card); padding:14px 16px; font-size:14px; line-height:1.55; color:var(--steel); margin-top:12px; }
+.source[hidden]{ display:none; }
+.source .mono{ display:block; color:var(--brass); margin-bottom:6px; }
+mark.q{ color:var(--graphite); background:linear-gradient(var(--ember),var(--ember)) left 92%/0% 2px no-repeat; transition:background-size 800ms var(--ease); padding-bottom:1px; }
+mark.q.lit{ background-size:100% 2px; }
+.resolve{ border:0; background:#faf8f4; border-radius:var(--r-card); padding:14px 16px; margin:12px 0 0; min-width:0; }
+.resolve legend{ float:left; width:100%; font:400 14px var(--font-display); color:var(--brass); margin-bottom:6px; padding:0; }
+.resolve p{ clear:both; font-size:13px !important; line-height:1.45 !important; margin:0 0 8px !important; }
+.resolve label{ display:block; font-size:13px; padding:4px 0 4px 24px; text-indent:-24px; cursor:pointer; }
+.resolve input{ margin:0 8px 0 0; vertical-align:-2px; accent-color:var(--graphite); }
+.reason{ margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.reason[hidden]{ display:none; }
+.reason input{ flex:1; min-width:180px; font:400 14px var(--font-body); padding:9px 10px; border:1px solid var(--graphite); border-radius:0; }
+.ro-note{ font-size:12px !important; color:var(--steel); margin:8px 0 0 !important; }
+.spinner{ width:10px; height:10px; border:1.5px solid var(--mist); border-top-color:var(--graphite); border-radius:50%; animation:spin .8s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.gate-done{ display:none; padding:16px 24px; background:var(--graphite); color:#fff; font:400 16px var(--font-display); justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.gate.complete .gate-done{ display:flex; animation:rise var(--med) var(--ease); }
+@keyframes rise{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+.log{ margin-top:14px; background:var(--graphite); color:#d6d6d6; border-radius:var(--r-card); padding:14px 16px; font:400 12px/1.7 var(--font-mono); max-height:170px; overflow:auto; }
+.log-h{ display:flex; justify-content:space-between; color:#9a9a9a; margin-bottom:4px; }
+.log ol{ list-style:none; margin:0; padding:0; }
+.log li{ animation:rise 260ms var(--ease); white-space:pre-wrap; }
+.log .t{ color:#8c8c8c; } .log .who{ color:#e8d6ad; } .log .sys{ color:#9a9a9a; font-style:italic; }
+.stage-foot{ display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:12px; font-size:13px; color:var(--steel); }
+
+/* Design question card */
+.dq{ background:var(--ivory); border-radius:var(--r-asym); padding:32px 36px; margin:40px 0 0; }
+@media (max-width:720px){ .dq{ padding:22px 18px; } }
+.dq .kicker{ margin-bottom:18px; }
+.dq dl{ margin:0; }
+.dq dl > div{ display:grid; grid-template-columns:140px 1fr; gap:20px; padding:14px 0; border-top:1px solid var(--ivory-line); }
+@media (max-width:640px){ .dq dl > div{ grid-template-columns:1fr; gap:4px; } }
+.dq dt{ font:400 11px var(--font-mono); letter-spacing:.06em; color:var(--brass); padding-top:5px; text-transform:uppercase; }
+.dq dd{ margin:0; font:400 18px/1.4 var(--font-display); letter-spacing:-0.01em; }
+.dq .files{ display:flex; flex-wrap:wrap; gap:6px; }
+.dq .files span{ font:400 12px var(--font-mono); background:rgba(255,255,255,.7); padding:6px 9px; border-radius:var(--r-card); }
+
+.verdict{ background:var(--white); border-radius:var(--r-data); padding:24px; }
+.verdict .top{ display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+.v-pill{ font:500 12px/1 var(--font-body); padding:6px 10px; border-radius:var(--r-data); box-shadow:inset 0 0 0 1px var(--brass); color:var(--brass); }
+.fgrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+@media (max-width:600px){ .fgrid{ grid-template-columns:1fr; } }
+.fact{ background:var(--fog); border-radius:var(--r-card); padding:12px 14px; font-size:13px; }
+.fact .mono{ display:block; color:var(--steel); margin-bottom:4px; }
+.fact.unknown{ background:#faf8f4; box-shadow:inset 0 0 0 1px var(--ivory); }
+
+.code{ background:#1b1b1b; border-radius:var(--r-card); overflow:hidden; margin-top:16px; color:#e6e6e6; }
+.code-tabs{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2c2c2c; padding-right:10px; }
+.code-tabs [role="tablist"]{ display:flex; }
+.code-tabs [role="tab"]{ background:none; border:0; color:#9a9a9a; font:400 12px var(--font-mono); padding:12px 16px; cursor:pointer; border-bottom:1px solid transparent; margin-bottom:-1px; }
+.code-tabs [role="tab"][aria-selected="true"]{ color:#fff; border-bottom-color:var(--ember); }
+.copy{ background:none; border:1px solid #3a3a3a; color:#bdbdbd; font:400 11px var(--font-mono); padding:5px 9px; cursor:pointer; }
+.copy:hover{ border-color:#777; color:#fff; }
+.code pre{ margin:0; padding:18px 20px; font:400 13px/1.7 var(--font-mono); overflow-x:auto; }
+.code pre[hidden]{ display:none; }
+.c-k{ color:#d9c08a; } .c-s{ color:#a8c7a0; } .c-c{ color:#8a8a8a; } .c-ok{ color:#a8c7a0; } .c-bad{ color:#ff8a5c; } .c-dim{ color:#9a9a9a; }
+
+.datedemo{ display:grid; grid-template-columns:1fr 290px; gap:24px; align-items:start; }
+@media (max-width:760px){ .datedemo{ grid-template-columns:1fr; } }
+.calc{ background:var(--white); border-radius:var(--r-data); padding:8px 22px 18px; font-size:14px; }
+.calc .line{ display:grid; grid-template-columns:1fr auto; gap:12px; padding:12px 0; border-bottom:1px solid var(--fog); }
+.calc .line span:first-child{ color:var(--steel); }
+.calc .line b{ font-weight:500; font-variant-numeric:tabular-nums; }
+.calc .result{ border-bottom:0; padding-top:16px; }
+.calc .result b{ font:400 24px var(--font-display); letter-spacing:-0.02em; }
+.seg-ctl{ display:inline-flex; border:1px solid var(--graphite); margin:14px 0 4px; }
+.seg-ctl label{ position:relative; cursor:pointer; }
+.seg-ctl input{ position:absolute; opacity:0; inset:0; cursor:pointer; }
+.seg-ctl span{ display:block; padding:8px 14px; font:400 14px var(--font-display); transition:background var(--fast), color var(--fast); }
+.seg-ctl input:checked + span{ background:var(--graphite); color:#fff; }
+.seg-ctl input:focus-visible + span{ outline:2px solid var(--graphite); outline-offset:2px; }
+.cal{ background:var(--white); border-radius:var(--r-data); padding:18px; }
+.cal-h{ display:flex; justify-content:space-between; font:400 15px var(--font-display); margin-bottom:12px; }
+.cal-g{ display:grid; grid-template-columns:repeat(7,1fr); gap:3px; text-align:center; font-size:12px; font-variant-numeric:tabular-nums; }
+.cal-g .dow{ color:var(--steel); font-size:11px; padding-bottom:6px; }
+.cal-g .d{ aspect-ratio:1; display:grid; place-items:center; border-radius:50%; }
+.cal-g .we{ color:var(--steel); background:var(--fog); }
+.cal-g .calc-day{ box-shadow:inset 0 0 0 1px var(--graphite); background:transparent; color:var(--graphite); }
+.cal-g .calc-day.rolled{ box-shadow:inset 0 0 0 1px var(--slate); color:var(--slate); text-decoration:line-through; text-decoration-color:var(--ember); }
+.cal-g .due{ background:var(--graphite); color:#fff; animation:pop 360ms var(--ease); }
+@keyframes pop{ 0%{ transform:scale(.6); } 70%{ transform:scale(1.08); } 100%{ transform:scale(1); } }
+.cal-legend{ display:flex; gap:14px; margin-top:12px; font-size:11px; color:var(--steel); flex-wrap:wrap; }
+.cal-legend i{ display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:-1px; }
+
+.leftout{ list-style:none; padding:0; margin:20px 0 0; display:grid; gap:8px; }
+.leftout li{ display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:16px 20px; background:var(--fog); border-radius:var(--r-card); font:400 16px var(--font-display); letter-spacing:-0.01em; }
+.leftout li span:last-child{ font:400 14px var(--font-body); color:var(--steel); }
+@media (max-width:600px){ .leftout li{ grid-template-columns:1fr; gap:4px; } }
+
+.next{ display:grid; grid-template-columns:1fr auto; align-items:end; gap:16px; padding:36px 40px; background:var(--ivory); border-radius:var(--r-asym); text-decoration:none; color:inherit; }
+.next small{ display:block; font:400 13px var(--font-display); color:var(--brass); margin-bottom:10px; }
+.next h3{ font-size:36px; line-height:1.1; }
+.next .arrow{ font:400 36px var(--font-display); transition:transform var(--med) var(--ease); }
+a.next:hover .arrow{ transform:translateX(8px); }
+div.next{ background:var(--fog); }
+div.next h3{ color:var(--steel); }
+
+/* Reveal: used only on charts and stats */
+[data-reveal]{ opacity:0; transform:translateY(8px); transition:opacity 600ms var(--ease), transform 600ms var(--ease); }
+[data-reveal].in{ opacity:1; transform:none; }
+::view-transition-old(root), ::view-transition-new(root){ animation-duration:260ms; }
+
+/* ============================================================
+   7. DESIGN NOTES LAYER
+   Pins and highlight live in their own layer. They never change
+   the styles of the elements they describe.
+   ============================================================ */
+#pins{ position:absolute; left:0; top:0; width:0; height:0; z-index:60; }
+.pin{ position:absolute; width:24px; height:24px; border-radius:50%; border:0; background:var(--brass); color:#fff;
+  font:500 11px/24px var(--font-mono); text-align:center; cursor:pointer; padding:0;
+  box-shadow:0 0 0 3px var(--white); animation:rise 220ms var(--ease); }
+.pin:hover, .pin.on{ background:var(--graphite); }
+#hl{ position:absolute; z-index:59; pointer-events:none; border:1.5px dashed var(--brass); border-radius:10px; opacity:0; transition:opacity var(--fast); }
+#hl.show{ opacity:1; }
+.notes-panel{ position:fixed; z-index:85; right:16px; top:16px; bottom:84px; width:340px; background:var(--white);
+  border-radius:var(--r-data); box-shadow:0 0 0 1px var(--mist); display:flex; flex-direction:column;
+  transform:translateX(calc(100% + 24px)); visibility:hidden; transition:transform var(--med) var(--ease), visibility 0s linear var(--med); }
+@media (min-width:1101px){
+  body{ transition:padding-right var(--med) var(--ease); }
+  body.notes-on{ padding-right:372px; }
+  body.notes-on .navpill, body.notes-on .chmenu{ left:calc(50% - 186px); }
+}
+body.notes-on .notes-panel{ transform:none; visibility:visible; transition-delay:0s; }
+.notes-panel header{ padding:20px 20px 12px; display:flex; justify-content:space-between; align-items:start; gap:12px; }
+.notes-panel h2{ font-size:20px; }
+.notes-panel header p{ font-size:13px; color:var(--steel); margin:4px 0 0; }
+.notes-panel .close{ background:var(--fog); border:0; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; flex:none; }
+.notes-panel ol{ list-style:none; margin:0; padding:0 12px 16px; overflow:auto; }
+.notes-panel li button{ display:grid; grid-template-columns:28px 1fr; gap:10px; width:100%; text-align:left; background:none; border:0; border-radius:12px; padding:12px 10px; cursor:pointer; font:400 14px/1.45 var(--font-body); color:var(--graphite); transition:background var(--fast); }
+.notes-panel li button:hover, .notes-panel li button.on{ background:var(--fog); }
+.notes-panel li .num{ width:22px; height:22px; border-radius:50%; background:var(--brass); color:#fff; font:500 11px/22px var(--font-mono); text-align:center; }
+.notes-panel li b{ display:block; font:400 15px var(--font-display); letter-spacing:-0.01em; margin-bottom:2px; font-weight:400; }
+.notes-panel li .t{ color:var(--steel); }
+@media (max-width:760px){
+  .notes-panel{ left:8px; right:8px; top:auto; bottom:80px; width:auto; height:44vh; transform:translateY(calc(100% + 100px)); }
+}
+
+/* ============================================================
+   8. REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+  [data-reveal]{ opacity:1; transform:none; }
+  .anim .dot{ opacity:1; transform:none; }
+}
+</style>
+</head>
+
+<body data-view="cover">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="wordmark" href="#" data-go="cover"><b>Millie Chan</b><span>Product designer</span></a>
+    <span class="where">Case study · AI for fund compliance</span>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- =================================================================
+     COVER
+     ================================================================= -->
+<div class="view" id="view-cover" data-title="Cover">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="kicker">Case study <span class="bracket">[2026]</span> · Work in progress · All data is fictional</p>
+        <h1 data-note="Headline|Two plain statements of what the product does, written for someone outside finance. Display face at weight 400, never bold.">AI agents draft a fund’s reporting calendar. A human specialist approves every rule.</h1>
+        <p class="lede">Investment funds must send regular reports to government regulators, each by a deadline set in law. My tool uses AI to read those laws and draft the deadlines, quoting the exact sentence each one comes from. A human compliance specialist checks and approves the work at three points, and plain code works out the final dates.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#" data-go="ch01">Start reading <span aria-hidden="true">→</span></a>
+          <a class="btn btn-ghost" href="#short">Read the short version</a>
+        </div>
+        <dl class="facts" data-note="Project facts|The role names both crews in plain words. The stack separates what is decided from what is planned, so nothing is overstated.">
+          <div><dt>Role</dt><dd>Product designer leading two crews of AI agents. The development crew helps me plan and build the product. The application crew is the set of AI agents inside the product, and I designed how it works. I make every decision.</dd></div>
+          <div><dt>Length</dt><dd>Six-week</dd></div>
+          <div style="grid-column:1/-1"><dt>Tech stack</dt><dd><ul class="stack">
+            <li>AI-Assisted Multi-Agent Application Development<span>method</span></li>
+            <li>Cursor + Claude Code<span>AI coding tools</span></li>
+            <li>CrewAI<span>runs the product’s AI agents</span></li>
+            <li>Next.js<span>website framework, intended</span></li>
+            <li>Rule-based date code<span>same answer every time</span></li>
+            <li>Answer-key tests<span>automatic marking</span></li>
+            <li>WCAG 2.2 AA<span>accessibility standard</span></li>
+          </ul></dd></div>
+        </dl>
+      </div>
+
+      <div class="sheet" data-note="Hero imagery|the design system says the charts are the imagery. Each card shows real data from the answer key, on the ivory paper surface.">
+        <div class="cluster">
+          <div class="dcard c-cal">
+            <div class="card-h"><h3>2027 reporting calendar</h3><span class="mono">Fictional fund · 22 deadlines</span></div>
+            <svg id="calChart" viewBox="0 0 372 124" role="img" aria-label="Dot chart of 22 due dates across 2027, one to three per month"></svg>
+            <div class="legend"><span><i style="background:var(--brass)"></i>Due date</span><span><i style="background:var(--ember)"></i>Moved off a weekend</span><span><i style="box-shadow:inset 0 0 0 1.5px var(--brass)"></i>Weekend rule not yet confirmed</span></div>
+          </div>
+          <div class="dcard c-ring">
+            <div class="ring-row">
+              <svg width="60" height="60" viewBox="0 0 64 64" aria-hidden="true">
+                <circle cx="32" cy="32" r="26" fill="none" stroke="var(--fog)" stroke-width="6"/>
+                <circle class="ring-arc" id="ringArc" cx="32" cy="32" r="26" fill="none" stroke="var(--ember)" stroke-width="6" stroke-linecap="round" transform="rotate(-90 32 32)" stroke-dasharray="163.4" stroke-dashoffset="163.4"/>
+              </svg>
+              <div><b>4 of 6</b><p class="small">rules approved or rejected by a person</p></div>
+            </div>
+          </div>
+          <div class="dcard c-flag" id="flagCard">
+            <span class="chip flag">Sources disagree</span>
+            <div class="bars">
+              <div class="bar law"><span class="lbl">The law</span><span class="track"><i></i></span><b>6 mo</b></div>
+              <div class="bar note"><span class="lbl">A practice guide</span><span class="track"><i></i></span><b>4 mo</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-ash" id="short">
+    <div class="wrap">
+      <div class="inshort">
+        <div><p class="kicker">About two minutes</p><h2>The short version</h2></div>
+        <ol class="short-list" data-note="Short version|Five plain points for readers who won’t scroll, written for someone outside finance. Each one can be checked against the project documents.">
+          <li><span class="bracket">[1]</span><span>Today a compliance specialist reads the law and types every reporting deadline into a spreadsheet by hand. Mistakes slip in: two of the team’s own documents give the same monthly report different lead times, 3 days and 10 days.</span></li>
+          <li><span class="bracket">[2]</span><span>In my tool, AI agents do the first reading of the law. Every rule they pull out must quote the exact sentence it came from, and a second AI agent checks that the quote is real.</span></li>
+          <li><span class="bracket">[3]</span><span>A human specialist then approves each rule, one at a time, at three checkpoints. There is <strong>no “approve all” button</strong>, and nothing is approved by default.</span></li>
+          <li><span class="bracket">[4]</span><span>The deadlines themselves are worked out by ordinary code, not by AI, so the same input always gives the same date.</span></li>
+          <li><span class="bracket">[5]</span><span>Before building anything, I wrote an answer key: the exact results the tool should produce, down to all 22 deadlines. Every test run will be marked against it.</span></li>
+        </ol>
+      </div>
+      <div class="stats" data-note="Numbers|Every number is a claim someone can check in the repo. White data cards on ash, with ember used only as a short rule.">
+        <div class="stat" data-reveal><span class="rule"></span><b>3</b><span>checkpoints where a person signs off</span></div>
+        <div class="stat" data-reveal><span class="rule"></span><b>0</b><span>deadlines calculated by AI</span></div>
+        <div class="stat" data-reveal><span class="rule"></span><b>22</b><span>deadlines in the answer key</span></div>
+        <div class="stat" data-reveal><span class="rule"></span><b>30<small>min</small></b><span>target time for a person to review the AI’s work</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="team-intro">
+        <div><p class="kicker">How it is built</p><h2>One designer, two crews of AI agents</h2></div>
+        <div><p>The <strong>development crew</strong> helps me build. It is ten AI agents, each set up to play one role on a product team, such as architect, engineer or tester. They follow a method called AI-Assisted Multi-Agent Application Development. I brief each one, review its work and make the decisions it isn’t allowed to make.</p>
+        <p style="margin-top:14px">The <strong>application crew</strong> lives inside the product. These are the AI agents that read the law, check the quotes and suggest which rules apply to the fund. They are planned to run on CrewAI, a tool for running teams of AI agents.</p></div>
+      </div>
+      <p class="kicker" style="margin:40px 0 12px">Development crew, by phase</p>
+      <div class="phase-rows" style="margin-top:0" data-note="Development crew|Adapts the partner-logo strip from the design system. Status is honest: only one agent has done its work so far.">
+        <div class="phase-row"><h3>Plan</h3><div class="personas">
+          <span class="persona used"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 8.5l3 3 7-7"/></svg>Product manager <em>Done</em></span>
+          <span class="persona">System architect <em>Next</em></span>
+          <span class="persona">UX designer <em>Next</em></span>
+        </div></div>
+        <div class="phase-row"><h3>Build</h3><div class="personas">
+          <span class="persona later">Project manager <em>Later</em></span>
+          <span class="persona later">Front-end engineer <em>Later</em></span>
+          <span class="persona later">Back-end engineer <em>Later</em></span>
+          <span class="persona later">Integration engineer <em>Later</em></span>
+          <span class="persona later">Tester (QA) <em>Later</em></span>
+          <span class="persona later">Security engineer <em>Later</em></span>
+        </div></div>
+        <div class="phase-row"><h3>Launch</h3><div class="personas">
+          <span class="persona later">Release engineer (DevOps) <em>Later</em></span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-ivory">
+    <div class="wrap">
+      <div class="index-head"><h2>Chapters</h2><p class="small" style="font-size:14px">A new chapter is added at the end of each phase.</p></div>
+      <ol class="chapters" data-note="Chapters|Reads like a report’s contents page. Unwritten chapters stay visible but aren’t clickable, so nothing leads to a dead end.">
+        <li><a class="ch" href="#" data-go="ch01"><span class="n">[01]</span><div><h3>The problem</h3><p>Who keeps track of these deadlines today, how, and where it goes wrong.</p></div><span class="tag"><i></i>Written</span><span class="arrow" aria-hidden="true">→</span></a></li>
+        <li><a class="ch" href="#" data-go="ch02"><span class="n">[02]</span><div><h3>Who decides what</h3><p>What the AI may do, what only a person may do, and the three checkpoints.</p></div><span class="tag"><i></i>Written</span><span class="arrow" aria-hidden="true">→</span></a></li>
+        <li><div class="ch"><span class="n">[03]</span><div><h3>Directing the agents</h3><p>The instructions I give AI tools, and what happened when they weren’t enough.</p></div><span class="tag t-collect"><i></i>Collecting each sprint</span><span></span></div></li>
+        <li><div class="ch"><span class="n">[04]</span><div><h3>Architecture</h3><p>The AI agents, the checker and the code that works out dates.</p></div><span class="tag t-build"><i></i>Build phase</span><span></span></div></li>
+        <li><div class="ch"><span class="n">[05]</span><div><h3>Interface</h3><p>The specialist’s review screens and the fund manager’s calendar.</p></div><span class="tag t-build"><i></i>Build phase</span><span></span></div></li>
+        <li><div class="ch"><span class="n">[06]</span><div><h3>Evidence</h3><p>How the AI scored against the answer key, and what changed after testing with real specialists.</p></div><span class="tag t-plan"><i></i>Planned</span><span></span></div></li>
+        <li><div class="ch"><span class="n">[07]</span><div><h3>Decisions and cuts</h3><p>What I left out and why.</p></div><span class="tag t-plan"><i></i>Planned</span><span></span></div></li>
+        <li><div class="ch"><span class="n">[08]</span><div><h3>Learnings</h3><p>What a product designer learned building a product run by AI agents.</p></div><span class="tag t-plan"><i></i>Planned</span><span></span></div></li>
+      </ol>
+    </div>
+  </section>
+</div>
+
+<!-- =================================================================
+     CHAPTER 01
+     ================================================================= -->
+<div class="view" id="view-ch01" data-title="Chapter 01" hidden>
+  <section class="ch-hero">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="#" data-go="cover" class="ul">Case study</a><span aria-hidden="true">/</span><span class="bracket">[01]</span></nav>
+      <h1>Deadlines set by hand</h1>
+      <p class="lede">Investment funds must send regular reports to regulators, each by a deadline set in law. Today a human compliance specialist reads the legal text, works out every report the fund owes and types the deadlines into a spreadsheet. The fund manager receives a long document and has no simple view of what is due.</p>
+      <div class="ch-meta"><span>Reading time<b>6 min</b></span><span>Phase<b>Plan</b></span></div>
+      <dl class="glance" data-note="At a glance|Three numbers sum up the chapter before you read it, and fill the space beside the title.">
+        <div><dt>2</dt><dd>people use the product</dd></div>
+        <div><dt>5</dt><dd>steps in today’s process</dd></div>
+        <div><dt>4</dt><dd>layers of rules behind one fund</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <div class="wrap reader">
+    <nav class="toc" aria-label="On this page">
+      <p class="kicker">On this page</p>
+      <ol>
+        <li><a href="#p1"><span class="mono">1.1</span>Who it affects</a></li>
+        <li><a href="#p2"><span class="mono">1.2</span>How it works today</a></li>
+        <li><a href="#p3"><span class="mono">1.3</span>Documents that disagree</a></li>
+        <li><a href="#p4"><span class="mono">1.4</span>Why the answers drift</a></li>
+      </ol>
+    </nav>
+
+    <article class="article">
+      <section id="p1">
+        <h2><span class="mono">1.1</span>Who it affects</h2>
+        <p class="first">Two people use the product. A third group sends most of the reports but doesn’t use it yet.</p>
+        <div class="stage wide" data-note="Proto-personas|Labelled as early profiles, because nobody has been interviewed yet. Each need traces to a requirement in the project documents.">
+          <p class="pnote"><span class="bracket">[!]</span>Early profiles, based on project documents. Nobody has been interviewed yet.</p>
+          <div class="persona-grid">
+            <div class="pcard">
+              <div class="who"><span class="glyph"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#202020" stroke-width="1.1"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M5.5 5.5h5M5.5 8h5M5.5 10.5h3"/></svg></span><div><h3>Compliance specialist</h3><span class="role">The main user. Owns the fund’s deadline calendar.</span></div></div>
+              <p class="today">Reads every new set of rules, works out what each one requires, sets deadlines by hand and chases the outside firms that send the reports.</p>
+              <h4>Needs</h4>
+              <ul>
+                <li>See exactly where each rule comes from, so it can be checked quickly.</li>
+                <li>Have disagreements between sources caught by a check, not by luck.</li>
+                <li>Nothing important happens without their approval.</li>
+                <li>Deadlines worked out the same way every time.</li>
+              </ul>
+            </div>
+            <div class="pcard">
+              <div class="who"><span class="glyph"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#202020" stroke-width="1.1"><rect x="2" y="3" width="12" height="11" rx="1"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3"/></svg></span><div><h3>Fund manager</h3><span class="role">Only reads the finished calendar.</span></div></div>
+              <p class="today">Responsible for the reports being sent, but sends few of them personally. Today they get a long legal document. Managers based outside Luxembourg know the local rules least well.</p>
+              <h4>Needs</h4>
+              <ul>
+                <li>Know what is due and when, without reading legal text.</li>
+                <li>Understand why each report applies to their fund.</li>
+                <li>Know who sends each report, so they know whether they need to act.</li>
+                <li>See only information a specialist has approved.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="filers">
+            <div><b>Outside firms that send the reports</b><p class="small">Each deadline names who sends it. They don’t use the product yet.</p></div>
+            <div class="chips"><span class="chip">Fund management company</span><span class="chip">Administrator</span><span class="chip">Auditor</span><span class="chip">Tax adviser</span><span class="chip">Local agent</span></div>
+          </div>
+        </div>
+        <div class="validate" data-note="Research gap|Stated openly. These questions become the interview plan for the build phase.">
+          <h4>What I still need to check with real people</h4>
+          <ol>
+            <li>How long does it take today to set up deadlines for a new set of rules, and which part takes longest?</li>
+            <li>Would a specialist approve a rule from its quote alone, or still open the full law?</li>
+            <li>Does a fund manager want the reason behind each deadline, or only the date and who sends it?</li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="p2">
+        <h2><span class="mono">1.2</span>How it works today</h2>
+        <p>Today the specialist’s work has five steps. Mistakes creep in at steps 2 and 3, where legal text is turned into deadlines.</p>
+        <div class="stage wide" data-note="Journey map|Rows run from what happens today to what the product changes. Orange dots mark where mistakes enter, taken from the research notes rather than guessed.">
+          <div class="stage-label"><p class="kicker">Today’s process · compliance specialist</p><span class="tag">From my research notes</span></div>
+          <div class="jmap">
+            <div class="jgrid" role="table" aria-label="Current journey map">
+              <div class="rh stg">Step</div>
+              <div class="stg"><span class="mono">01</span><b>New rules arrive</b></div>
+              <div class="stg"><span class="mono">02</span><b>Read and interpret</b></div>
+              <div class="stg"><span class="mono">03</span><b>Set deadlines</b></div>
+              <div class="stg"><span class="mono">04</span><b>Chase the senders</b></div>
+              <div class="stg"><span class="mono">05</span><b>Fix mistakes</b></div>
+
+              <div class="rh">What happens</div>
+              <div>The rules arrive as documents that aren’t connected to any system.</div>
+              <div>Reads the legal text and works out what each rule requires.</div>
+              <div>Types each deadline into spreadsheets and to-do tools.</div>
+              <div>Contacts the outside firms that send the reports.</div>
+              <div>Corrects a deadline when someone happens to notice a problem.</div>
+
+              <div class="rh">Pain point</div>
+              <div class="pain">Starts again for every new set of rules.</div>
+              <div class="pain">Several rulebooks describe the same report in different words.</div>
+              <div class="pain">Documents end up disagreeing with each other.</div>
+              <div class="pain">All the chasing is done by hand.</div>
+              <div class="pain">Nothing checks for mismatches. A person has to spot them.</div>
+
+              <div class="rh">Mistakes enter</div>
+              <div class="err no"><i></i>No</div>
+              <div class="err"><i></i>Yes</div>
+              <div class="err"><i></i>Yes</div>
+              <div class="err no"><i></i>No</div>
+              <div class="err no"><i></i>Found late</div>
+
+              <div class="rh">Fund manager</div>
+              <div>Receives a long document listing requirements.</div>
+              <div>Not involved.</div>
+              <div>Not involved.</div>
+              <div>Not involved.</div>
+              <div>No simple view of what is due, or why.</div>
+
+              <div class="rh opp">With the product</div>
+              <div class="opp">AI agents read the (test) rules.</div>
+              <div class="opp">Each rule quotes the exact sentence it came from.</div>
+              <div class="opp">An AI checker flags disagreements. Code works out the dates.</div>
+              <div class="opp">Each deadline names who sends it. Reminders come later.</div>
+              <div class="opp">Disagreements are flagged before anyone approves.</div>
+            </div>
+          </div>
+          <p class="scroll-hint">Scroll sideways to see all five steps.</p>
+        </div>
+      </section>
+
+      <section id="p3">
+        <h2><span class="mono">1.3</span>Documents that disagree</h2>
+        <p>The team’s own documents give different answers for the same report. No check caught any of these.</p>
+        <div class="dumb" data-reveal data-note="Mismatch chart|A dumbbell chart shows the size of each disagreement at a glance. Each row has its own scale, labelled underneath.">
+          <div class="drow">
+            <div class="name">Monthly report to the regulator<small>Lead time in days</small></div>
+            <div class="track2" style="--a:23%;--b:77%">
+              <span class="axis"></span><span class="span"></span>
+              <span class="pt" style="left:23%"></span><span class="pl" style="left:23%">3 days</span>
+              <span class="pt b" style="left:77%"></span><span class="pl" style="left:77%">10 days</span>
+              <span class="ax" style="left:0%">0</span><span class="ax" style="left:100%">13</span>
+            </div>
+          </div>
+          <div class="drow">
+            <div class="name">Annual report<small>Lead time in days</small></div>
+            <div class="track2" style="--a:23%;--b:92%">
+              <span class="axis"></span><span class="span"></span>
+              <span class="pt" style="left:23%"></span><span class="pl" style="left:23%">30 days</span>
+              <span class="pt b" style="left:92%"></span><span class="pl" style="left:92%">120 days</span>
+              <span class="ax" style="left:0%">0</span><span class="ax" style="left:100%">130</span>
+            </div>
+          </div>
+          <div class="drow">
+            <div class="name">VAT tax return<small>How the deadline is set</small></div>
+            <div class="textcmp"><span>A fixed date</span><em aria-hidden="true">≠</em><span>31 October after year end</span></div>
+          </div>
+        </div>
+        <p class="caption">Examples from my research notes. Which answer is right is still open. The product’s job is to spot the disagreement and show it to a person.</p>
+      </section>
+
+      <section id="p4">
+        <h2><span class="mono">1.4</span>Why the answers drift</h2>
+        <p>One fund has to follow several sets of rules at once: Luxembourg law, EU law, tax rules, and the rules of each country where it is sold. Each set has its own regulator, deadlines and wording, so the same report can be described differently in different places. The project’s test data covers several of these layers.</p>
+        <div class="stage wide" data-note="Layers|Stacked bands show the overlap. Each test report sits in the layer it comes from, linking the problem to the test data.">
+          <div class="layers">
+            <div class="layer"><div><h4>Luxembourg fund law</h4><p>The main law for this kind of fund (Law of 17 December 2010, Part II).</p></div><div class="chips"><span class="chip">Monthly report</span><span class="chip">Annual report</span></div></div>
+            <div class="layer"><div><h4>Fund-manager law</h4><p>Rules for the company that manages the fund, from Luxembourg and the EU.</p></div><div class="chips"><span class="none">Not in the test data</span></div></div>
+            <div class="layer"><div><h4>Other EU rules</h4><p>For example, rules on investor documents and on sustainability.</p></div><div class="chips"><span class="none">Not in the test data</span></div></div>
+            <div class="layer"><div><h4>Tax, ownership and cross-border rules</h4><p>Fund taxes, the register of who owns the fund, and reports in each country where it is sold.</p></div><div class="chips"><span class="chip">Fund tax</span><span class="chip">Spain report</span><span class="chip">Ownership update</span><span class="chip">VAT return</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <a class="next" href="#" data-go="ch02"><div><small><span class="bracket">[02]</span> Next chapter</small><h3>Who decides what</h3></div><span class="arrow" aria-hidden="true">→</span></a>
+    </article>
+  </div>
+</div>
+
+<!-- =================================================================
+     CHAPTER 02
+     ================================================================= -->
+<div class="view" id="view-ch02" data-title="Chapter 02" hidden>
+  <section class="ch-hero">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="#" data-go="cover" class="ul">Case study</a><span aria-hidden="true">/</span><span class="bracket">[02]</span></nav>
+      <h1>Who decides what</h1>
+      <p class="lede">Before designing any screens, I wrote down every action in the product and who is allowed to take it. AI agents can only suggest. A human specialist approves, and plain code works out every date.</p>
+      <div class="ch-meta"><span>Reading time<b>8 min</b></span><span>Phase<b>Plan</b></span></div>
+      <dl class="glance" data-note="At a glance|Three numbers sum up the chapter before you read it, and fill the space beside the title.">
+        <div><dt>4</dt><dd>kinds of record, each with a permanent ID</dd></div>
+        <div><dt>3</dt><dd>checkpoints where a person signs off</dd></div>
+        <div><dt>2</dt><dd>demos you can try</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <div class="wrap reader">
+    <nav class="toc" aria-label="On this page" data-note="Contents|Stays on screen while you read. The ember bar marks the current section, and the grey line fills as you go.">
+      <p class="kicker">On this page</p>
+      <ol>
+        <li><a href="#s1"><span class="mono">2.1</span>The four records</a></li>
+        <li><a href="#s2"><span class="mono">2.2</span>Who may do what</a></li>
+        <li><a href="#s3"><span class="mono">2.3</span>One decision at a time</a></li>
+        <li><a href="#s4"><span class="mono">2.4</span>When “not sure” is right</a></li>
+        <li><a href="#s5"><span class="mono">2.5</span>Dates come from code</a></li>
+        <li><a href="#s6"><span class="mono">2.6</span>Left out on purpose</a></li>
+      </ol>
+    </nav>
+
+    <article class="article">
+      <section id="s1">
+        <h2><span class="mono">2.1</span>The four records</h2>
+        <p class="first">The product keeps four kinds of record. Each one keeps the same ID every time the tool runs, so any date on the calendar can be traced back to the sentence of law it came from.</p>
+        <p>Tracking whether a report has been sent is out of scope for now. Because each deadline keeps its ID, that can be added later without rebuilding the calendar.</p>
+        <div class="stage wide" data-note="Object model|Records and their states come before screens. Hover or tab through the cards. The arrows show what each record is made from.">
+          <div class="objects" role="list">
+            <div class="obj" tabindex="0" role="listitem"><span class="k">A paragraph of law</span><span class="mono">SRC-CSSF15627-P2</span><p class="by">Test text written to read like the law. Never changed.</p><div class="states"><span>the law itself</span><span>a summary</span></div></div>
+            <div class="obj" tabindex="0" role="listitem"><span class="k">A rule</span><span class="mono">OBL-01</span><p class="by">Pulled out by an AI agent, checked by a second one, then decided by a person at checkpoint 1.</p><div class="states"><span>waiting</span><span>flagged</span><span>approved</span><span>rejected</span></div></div>
+            <div class="obj" tabindex="0" role="listitem"><span class="k">A decision</span><span class="mono">OBL-01 × FND-DEMO-01</span><p class="by">Does the rule apply to this fund? Suggested by AI, decided by a person at checkpoint 2.</p><div class="states"><span>applies</span><span>doesn’t apply</span><span>not sure</span></div></div>
+            <div class="obj" tabindex="0" role="listitem"><span class="k">A deadline</span><span class="mono">OBL-01 · 2027-01</span><p class="by">Worked out by code, published by a person at checkpoint 3.</p><div class="states"><span>draft</span><span>published</span><span>under review</span></div></div>
+          </div>
+        </div>
+        <p class="caption">“Under review” is a calm notice the fund manager sees while a published deadline is being corrected.</p>
+      </section>
+
+      <section id="s2">
+        <h2><span class="mono">2.2</span>Who may do what</h2>
+        <p>I listed every action in a table against everyone who might take it. The most important cells say <strong>Never</strong>: an AI agent can never approve its own work, and no AI can set a date.</p>
+        <div class="table-wrap" data-note="Permissions table|Dense-table craft: hairlines only, aligned columns, and the deciding cells in weight 500 so the eye finds them first.">
+          <table class="perm">
+            <caption class="sr-only">Who may perform each action</caption>
+            <thead><tr><th scope="col">Action</th><th scope="col">AI agents</th><th scope="col">Specialist (a person)</th><th scope="col">Fund manager</th><th scope="col">Code</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Pull rules out of the law</th><td>Suggest</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+              <tr><th scope="row">Flag disagreements</th><td>Flag (checker)</td><td class="dec">Settles them</td><td class="na">–</td><td class="na">–</td></tr>
+              <tr><th scope="row">Approve a rule (checkpoint 1)</th><td class="never">Never</td><td class="dec">Decides each one</td><td class="na">–</td><td class="na">–</td></tr>
+              <tr><th scope="row">Decide if a rule applies to the fund (checkpoint 2)</th><td>Suggest</td><td class="dec">Confirms or changes</td><td class="na">–</td><td class="na">–</td></tr>
+              <tr><th scope="row">Work out deadlines</th><td class="never">Never</td><td class="na">–</td><td class="na">–</td><td class="dec">Calculates</td></tr>
+              <tr><th scope="row">Publish the calendar (checkpoint 3)</th><td class="never">Never</td><td class="dec">Publishes or sends back</td><td class="na">–</td><td class="na">–</td></tr>
+              <tr><th scope="row">Read the published calendar</th><td class="na">–</td><td>Yes</td><td>Yes</td><td class="na">–</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <blockquote class="pull">“Never” means the button doesn’t exist.<cite>From my learning notes, planning phase</cite></blockquote>
+      </section>
+
+      <section id="s3">
+        <h2><span class="mono">2.3</span>One decision at a time</h2>
+        <p>The specialist approves, edits or rejects each rule on its own. There is no “approve all” button on purpose: it would let someone approve rules they never read. Try checkpoint 1 below with the project’s test data.</p>
+        <div class="stage wide" data-note="Checkpoint demo|There is no “approve all” to find. Approve stays disabled on the conflicted row until the visitor picks a source, as the real checker requires.">
+          <div class="stage-label"><p class="kicker">Try it · checkpoint 1 with test data</p><span class="tag">3 of 6 rules shown</span></div>
+          <div class="gate" id="gate">
+            <div class="gate-head">
+              <div class="r1"><h3>Checkpoint 1 · Approve rules</h3><span class="count" id="gateCount" aria-live="polite">0 of 3 decided</span></div>
+              <div class="segs" id="gateSegs" aria-hidden="true"><span></span><span></span><span></span></div>
+              <p class="small">This step is finished only when every rule has a decision.</p>
+            </div>
+
+            <div class="g-row" data-id="OBL-01" data-state="pending">
+              <div>
+                <div class="g-head"><span class="mono">OBL-01</span><span class="g-title">Monthly financial report</span><span class="g-state">Waiting</span></div>
+                <div class="g-meta">To the Luxembourg regulator (CSSF) · Due 10 days after each month ends · Sent by the fund administrator</div>
+                <div class="g-ver"><span class="chip ok">Quote found in the law</span><button class="linkbtn" data-src aria-expanded="false">Show source</button></div>
+                <div class="source g-src" hidden><span class="mono">SRC-CSSF15627-P2</span>Each undertaking for collective investment within the scope of this circular shall transmit the monthly financial information report U1.1 to the CSSF <mark class="q">no later than 10 calendar days after the end of each month</mark>.</div>
+                <div class="reason" hidden><input type="text" placeholder="Reason for rejecting (required)" aria-label="Reason for rejecting OBL-01"><button class="btn btn-sm btn-primary" data-confirm disabled>Reject</button><button class="linkbtn" data-cancel>Cancel</button></div>
+              </div>
+              <div class="g-actions"><button class="btn btn-sm btn-primary" data-act="approve">Approve</button><button class="btn btn-sm btn-ghost" data-act="edit">Edit</button><button class="btn btn-sm btn-ghost" data-act="reject">Reject</button></div>
+            </div>
+
+            <div class="g-row" data-id="OBL-03" data-state="pending" data-conflict>
+              <div>
+                <div class="g-head"><span class="mono">OBL-03</span><span class="g-title">Audited annual report</span><span class="g-state">Waiting</span></div>
+                <div class="g-meta">To the Luxembourg regulator (CSSF) · Due 6 months after the financial year ends · Sent by the fund administrator, with the management company and auditor</div>
+                <div class="g-ver"><span class="chip flag">Two sources disagree</span><button class="linkbtn" data-src aria-expanded="false">Show source</button></div>
+                <div class="source g-src" hidden><span class="mono">SRC-UCILAW-P3 · the law itself</span>An undertaking for collective investment subject to Part II of this law shall publish an audited annual report and file it with the CSSF <mark class="q">within six months of the end of the period to which it relates</mark>.</div>
+                <fieldset class="resolve">
+                  <legend>Flagged by the AI checker</legend>
+                  <p>The checker points out disagreements but never settles them. Pick which source this rule should follow, then approve.</p>
+                  <label><input type="radio" name="c1" value="6">6 months, from the law itself</label>
+                  <label><input type="radio" name="c1" value="4">4 months, from a practice guide (someone’s summary of the law)</label>
+                </fieldset>
+                <div class="reason" hidden><input type="text" placeholder="Reason for rejecting (required)" aria-label="Reason for rejecting OBL-03"><button class="btn btn-sm btn-primary" data-confirm disabled>Reject</button><button class="linkbtn" data-cancel>Cancel</button></div>
+              </div>
+              <div class="g-actions"><button class="btn btn-sm btn-primary" data-act="approve" disabled title="Choose a source first">Approve</button><button class="btn btn-sm btn-ghost" data-act="edit">Edit</button><button class="btn btn-sm btn-ghost" data-act="reject">Reject</button></div>
+            </div>
+
+            <div class="g-row" data-id="OBL-04" data-state="pending">
+              <div>
+                <div class="g-head"><span class="mono">OBL-04</span><span class="g-title">Quarterly report for Spain</span><span class="g-state">Waiting</span></div>
+                <div class="g-meta">To the Spanish regulator (CNMV) · Due 2 months after each quarter ends · Sent by a local agent in Spain</div>
+                <div class="g-ver"><span class="chip ok">Quote found in the law</span><button class="linkbtn" data-src aria-expanded="false">Show source</button></div>
+                <div class="source g-src" hidden><span class="mono">SRC-CNMV-P1</span>Foreign undertakings for collective investment registered with the CNMV for marketing in Spain shall submit statistical report A01 to the CNMV each quarter, <mark class="q">within two months after the last calendar day of the quarter</mark>.</div>
+                <div class="reason" hidden><input type="text" placeholder="Reason for rejecting (required)" aria-label="Reason for rejecting OBL-04"><button class="btn btn-sm btn-primary" data-confirm disabled>Reject</button><button class="linkbtn" data-cancel>Cancel</button></div>
+              </div>
+              <div class="g-actions"><button class="btn btn-sm btn-primary" data-act="approve">Approve</button><button class="btn btn-sm btn-ghost" data-act="edit">Edit</button><button class="btn btn-sm btn-ghost" data-act="reject">Reject</button></div>
+            </div>
+
+            <div class="gate-done" role="status"><span>Checkpoint 1 complete. A person decided every rule.</span><span>Next: checkpoint 2 →</span></div>
+          </div>
+          <div class="log" aria-label="Audit log">
+            <div class="log-h"><span>activity log</span><span>entries can’t be deleted</span></div>
+            <ol id="log" aria-live="polite"></ol>
+          </div>
+          <div class="stage-foot"><span>Editing sends a rule back to the checker. Rejecting needs a reason.</span><button class="linkbtn" id="resetDemo">Reset demo</button></div>
+        </div>
+
+        <div class="dq" data-note="Design question card|Used in every chapter: the question, what I found, what changed, and the file where the change is recorded.">
+          <p class="kicker">Design question · Planning phase</p>
+          <dl>
+            <div><dt>Question</dt><dd>Could a rejected rule sneak back onto the calendar without anyone deciding it should?</dd></div>
+            <div><dt>What I found</dt><dd>When I mapped every way a rule could come back, editing a rejected rule turned out to be a second way in, with no reason asked for.</dd></div>
+            <div><dt>What changed</dt><dd>Rejected rules are now locked. To change one, the specialist has to reopen it and give a reason, and it goes through checkpoints 1 and 2 again.</dd></div>
+            <div><dt>Recorded in</dt><dd><div class="files"><span>1.define/system-description.md · FR-023</span><span>1.define/approval-map.md · H4b</span><span>US-004 · AC11</span></div></dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section id="s4">
+        <h2><span class="mono">2.4</span>When “not sure” is right</h2>
+        <p>Sometimes the honest answer is “not sure”. The fictional fund is sold in Spain, but nobody has confirmed it is registered with the Spanish regulator. The Spanish report is only required for registered funds, so the right answer is “not sure”, and a person decides. An AI that answers “yes, it applies” sounds reasonable but is wrong.</p>
+        <div class="stage wide" data-note="Input and output|The answer key sits next to the test output. The output is marked illustrative because the evals haven’t run yet.">
+          <div class="verdict">
+            <div class="top"><span><span class="mono">OBL-04</span> · Quarterly report for Spain</span><span class="v-pill">Not sure · a person decides</span></div>
+            <p style="font-size:15px;margin:0">This report is only required if the fund is registered with the Spanish regulator. Being sold in Spain isn’t the same thing, and the fund’s records don’t confirm registration.</p>
+            <div class="fgrid">
+              <div class="fact"><span class="mono">FACT-03</span>Sold in Luxembourg, Germany and Spain</div>
+              <div class="fact unknown"><span class="mono">FACT-04</span>Registered with the Spanish regulator: <b style="font-weight:500">unknown</b></div>
+            </div>
+          </div>
+          <div class="code">
+            <div class="code-tabs">
+              <div role="tablist" aria-label="Code example">
+                <button role="tab" aria-selected="true" aria-controls="tab-key" id="t-key">answer key · OBL-04</button>
+                <button role="tab" aria-selected="false" aria-controls="tab-out" id="t-out" tabindex="-1">test result · example only</button>
+              </div>
+              <button class="copy" data-copy>Copy</button>
+            </div>
+<pre id="tab-key" role="tabpanel" aria-labelledby="t-key"><span class="c-k">code</span>: <span class="c-s">OBL-04</span>
+<span class="c-k">fund</span>: <span class="c-s">FND-DEMO-01</span>
+<span class="c-k">expected_verdict</span>: <span class="c-s">unsure</span>
+<span class="c-k">facts_used</span>: [<span class="c-s">FACT-03</span>, <span class="c-s">FACT-04</span>]
+<span class="c-k">known_wrong_answer</span>: <span class="c-s">applies</span>   <span class="c-c"># being sold in Spain is not the same as being registered</span>
+<span class="c-k">resolved_at_checkpoint_2</span>: <span class="c-s">applies (precautionary: registration unconfirmed)</span></pre>
+<pre id="tab-out" role="tabpanel" aria-labelledby="t-out" hidden><span class="c-dim">applicability · FND-DEMO-01</span>
+<span class="c-ok">✓</span> OBL-01  applies
+<span class="c-ok">✓</span> OBL-02  applies
+<span class="c-ok">✓</span> OBL-03  applies
+<span class="c-bad">✗</span> OBL-04  expected unsure, got applies
+          <span class="c-bad">being sold in Spain is not the same as being registered</span>
+<span class="c-ok">✓</span> OBL-05  applies
+<span class="c-ok">✓</span> OBL-06  does not apply
+<span class="c-dim">5 of 6 passed</span></pre>
+          </div>
+        </div>
+        <p class="caption">The answer key also records the likely wrong answer, so a test can tell a confident mistake from a correct answer.</p>
+      </section>
+
+      <section id="s5">
+        <h2><span class="mono">2.5</span>Dates come from code</h2>
+        <p>Month ends, leap years and weekends are easy to get wrong, so no AI sets a date. Plain code takes a starting date, adds the time allowed, then applies that report’s own weekend rule. Some deadlines move to the next working day when they land on a weekend. Tax deadlines stay where they fall.</p>
+        <div class="stage wide" data-note="Date demo|The visitor changes the rule, not the model, and sees the same input give the same answer every time.">
+          <div class="stage-label"><p class="kicker">Try it · monthly report for December 2026</p><span class="tag">No AI involved</span></div>
+          <div class="datedemo">
+            <div class="calc">
+              <div class="line"><span>Start date (end of the month)</span><b>Thu 31 Dec 2026</b></div>
+              <div class="line"><span>Time allowed</span><b>+ 10 days</b></div>
+              <div class="line"><span>Falls on</span><b>Sun 10 Jan 2027</b></div>
+              <div class="seg-ctl" role="radiogroup" aria-label="Weekend rule">
+                <label><input type="radio" name="roll" value="roll" checked><span>Move to next working day</span></label>
+                <label><input type="radio" name="roll" value="none"><span>Keep the date</span></label>
+              </div>
+              <div class="line result"><span>Due date</span><b id="dueOut" aria-live="polite">Mon 11 Jan 2027</b></div>
+              <p class="small" id="rollNote">Sunday isn’t a working day, so the deadline moves to Monday.</p>
+            </div>
+            <div class="cal" aria-hidden="true">
+              <div class="cal-h"><span>January 2027</span><span class="mono" style="color:var(--steel)">Monthly report</span></div>
+              <div class="cal-g" id="calGrid"></div>
+              <div class="cal-legend"><span><i style="box-shadow:inset 0 0 0 1px var(--graphite)"></i>Falls on</span><span><i style="background:var(--graphite)"></i>Due</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s6">
+        <h2><span class="mono">2.6</span>Left out on purpose</h2>
+        <p>I list each thing I left out, with the reason, so a reader can tell a deliberate choice from something forgotten.</p>
+        <ul class="leftout">
+          <li><span>Taking back a published calendar</span><span>Postponed. Must be added before real-world use.</span></li>
+          <li><span>Tracking whether a report was sent</span><span>Out of scope. Permanent IDs keep the option open.</span></li>
+          <li><span>Reminding the outside firms</span><span>Out of scope. Each deadline already names who sends it.</span></li>
+        </ul>
+      </section>
+
+      <div class="next"><div><small><span class="bracket">[03]</span> Stories added each sprint</small><h3>Directing the agents</h3></div></div>
+    </article>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <h2>Hiring for AI product design? I’d like to hear from you.</h2>
+    <div class="links"><a class="ul" href="#">Get in touch</a><a class="ul" href="#">LinkedIn</a></div>
+  </div>
+</footer>
+
+<!-- Design notes: overlay layer + panel -->
+<div id="pins"></div>
+<div id="hl" aria-hidden="true"></div>
+<aside class="notes-panel" id="notesPanel" aria-label="Design notes">
+  <header><div><h2>Design notes</h2><p id="notesSub">Why this page looks and works the way it does.</p></div><button class="close" id="notesClose" aria-label="Close design notes">×</button></header>
+  <ol id="notesList"></ol>
+</aside>
+
+<!-- Chapter menu (opens from the pill) -->
+<div class="chmenu" id="chmenu" role="dialog" aria-label="Chapters">
+  <p>Chapters</p>
+  <ol>
+    <li><a href="#" data-go="ch01"><span class="n">[01]</span>The problem<span class="s">Written</span></a></li>
+    <li><a href="#" data-go="ch02"><span class="n">[02]</span>Who decides what<span class="s">Written</span></a></li>
+    <li><span class="off"><span class="n">[03]</span>Directing the agents<span class="s">Collecting</span></span></li>
+    <li><span class="off"><span class="n">[04]</span>Architecture<span class="s">Build phase</span></span></li>
+    <li><span class="off"><span class="n">[05]</span>Interface<span class="s">Build phase</span></span></li>
+    <li><span class="off"><span class="n">[06]</span>Evidence<span class="s">Planned</span></span></li>
+    <li><span class="off"><span class="n">[07]</span>Decisions and cuts<span class="s">Planned</span></span></li>
+    <li><span class="off"><span class="n">[08]</span>Learnings<span class="s">Planned</span></span></li>
+  </ol>
+</div>
+
+<!-- The only navigation -->
+<nav class="navpill" aria-label="Site">
+  <button data-go="cover" id="navCover">Cover</button>
+  <button id="navChapters" aria-expanded="false" aria-controls="chmenu"><span id="navChLabel">Chapters</span><span class="caret" aria-hidden="true">▲</span></button>
+  <span class="sep" aria-hidden="true"></span>
+  <button id="notesBtn" aria-pressed="false"><span class="pin-dot" aria-hidden="true"></span>Design notes</button>
+  <span class="navprog" aria-hidden="true"><i id="navProg"></i></span>
+</nav>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const params = new URLSearchParams(location.search);
+  let view = 'cover';
+  const scrollMemory = {};   // remembers where you were on the cover
+  const currentView = () => $('#view-' + view);
+
+  /* ---------------- Views ---------------- */
+  function show(v, animate = true) {
+    scrollMemory[view] = scrollY;
+    const swap = () => {
+      view = v; document.body.dataset.view = v;
+      $$('.view').forEach(el => el.hidden = el.id !== 'view-' + v);
+      $('#navCover').setAttribute('aria-current', v === 'cover' ? 'page' : 'false');
+      $('#navChLabel').textContent = v === 'cover' ? 'Chapters' : 'Chapter ' + v.slice(2);
+      $$('#chmenu a').forEach(a => a.setAttribute('aria-current', a.dataset.go === v ? 'page' : 'false'));
+      closeMenu();
+      // Jump, don't animate: the crossfade hides the change, so there is no visible scrolling.
+      window.scrollTo({ top: v === 'cover' ? (scrollMemory.cover || 0) : 0, behavior: 'instant' });
+      if (v === 'ch02') renderCal();
+      requestAnimationFrame(() => { placeMarginNotes(); observeReveals(); setupSpy(); buildNotes(); onScroll(); });
+      history.replaceState(null, '', location.pathname + location.search + (v === 'cover' ? '' : '#' + v));
+    };
+    if (animate && document.startViewTransition && !reduce) document.startViewTransition(swap); else swap();
+  }
+  document.addEventListener('click', e => {
+    const go = e.target.closest('[data-go]');
+    if (go) { e.preventDefault(); show(go.dataset.go); }
+  });
+
+  /* ---------------- Chapter menu ---------------- */
+  const menu = $('#chmenu'), chBtn = $('#navChapters');
+  function closeMenu() { menu.classList.remove('open'); chBtn.setAttribute('aria-expanded', 'false'); }
+  chBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = !menu.classList.contains('open');
+    menu.classList.toggle('open', open); chBtn.setAttribute('aria-expanded', open);
+    if (open) setTimeout(() => $('a', menu).focus(), 30);
+  });
+  document.addEventListener('click', e => { if (!menu.contains(e.target) && !chBtn.contains(e.target)) closeMenu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeMenu(); if (document.body.classList.contains('notes-on')) toggleNotes(false); } });
+
+  /* ---------------- Progress + contents scrollspy ---------------- */
+  function onScroll() {
+    const art = $('.article', currentView());
+    if (!art) return;
+    const r = art.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (innerHeight * .35 - r.top) / r.height)).toFixed(3);
+    $('#navProg').style.setProperty('--p', p);
+    const ol = $('.toc ol', currentView()); if (ol) ol.style.setProperty('--p', p);
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  let spy;
+  function setupSpy() {
+    spy && spy.disconnect();
+    const links = $$('.toc a', currentView()); if (!links.length) return;
+    links[0].classList.add('active');
+    spy = new IntersectionObserver(es => es.forEach(en => {
+      if (en.isIntersecting) links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + en.target.id));
+    }), { rootMargin: '-25% 0px -65% 0px' });
+    $$('.article section', currentView()).forEach(s => spy.observe(s));
+  }
+
+  /* ---------------- Reveal (charts and stats only) ---------------- */
+  const rev = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); rev.unobserve(en.target); } }), { threshold: .3 });
+  function observeReveals() { $$('[data-reveal]:not(.in)', currentView()).forEach(el => rev.observe(el)); }
+
+  /* ---------------- Margin notes aligned to sections ---------------- */
+  function placeMarginNotes() {
+    const col = $('.margin-col', currentView()); if (!col || getComputedStyle(col).display === 'none') return;
+    const top0 = col.getBoundingClientRect().top + scrollY;
+    $$('.mnote', col).forEach(n => { const s = document.getElementById(n.dataset.for); n.style.top = (s.getBoundingClientRect().top + scrollY - top0 + 6) + 'px'; });
+  }
+
+  /* ---------------- Hero: 2027 calendar dot chart, drawn from the answer key ---------------- */
+  // r = moved to next business day, u = roll rule unconfirmed
+  const cal2027 = [
+    [['OBL-01','11 Jan','r'],['OBL-02','20 Jan']],
+    [['OBL-01','10 Feb'],['OBL-05','28 Feb','u'],['OBL-04','28 Feb','u']],
+    [['OBL-01','10 Mar']],
+    [['OBL-01','12 Apr','r'],['OBL-02','20 Apr']],
+    [['OBL-01','10 May'],['OBL-04','31 May']],
+    [['OBL-01','10 Jun'],['OBL-03','30 Jun']],
+    [['OBL-01','12 Jul','r'],['OBL-02','20 Jul']],
+    [['OBL-01','10 Aug'],['OBL-04','31 Aug']],
+    [['OBL-01','10 Sep']],
+    [['OBL-01','11 Oct','r'],['OBL-02','20 Oct']],
+    [['OBL-01','10 Nov'],['OBL-04','30 Nov']],
+    [['OBL-01','10 Dec']]
+  ];
+  (function drawCal() {
+    const svg = $('#calChart'), months = 'JFMAMJJASOND';
+    const names = { 'OBL-01':'Monthly report', 'OBL-02':'Fund tax', 'OBL-03':'Annual report', 'OBL-04':'Spain report', 'OBL-05':'Ownership update' };
+    let html = '<line x1="6" y1="98" x2="366" y2="98" stroke="#e8e8e8"/>', n = 0;
+    cal2027.forEach((m, i) => {
+      const x = 21 + i * 30;
+      m.forEach((e, k) => {
+        const y = 84 - k * 22, d = (n++) * 40;
+        const fill = e[2] === 'r' ? 'var(--ember)' : e[2] === 'u' ? '#fff' : 'var(--brass)';
+        const stroke = e[2] === 'u' ? 'stroke="var(--brass)" stroke-width="1.6"' : '';
+        const note = e[2] === 'r' ? ' · moved off a weekend' : e[2] === 'u' ? ' · weekend rule not yet confirmed' : '';
+        html += `<circle class="dot" cx="${x}" cy="${y}" r="7" fill="${fill}" ${stroke} style="animation-delay:${d}ms"><title>${names[e[0]]} · due ${e[1]} 2027${note}</title></circle>`;
+      });
+      html += `<text x="${x}" y="117" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#4d4d4d">${months[i]}</text>`;
+    });
+    svg.innerHTML = html;
+    if (!reduce) svg.classList.add('anim');
+    setTimeout(() => { $('#ringArc').style.strokeDashoffset = 163.4 * (1 - 4 / 6); $('#flagCard').classList.add('grown'); }, 50);
+  })();
+
+  /* ---------------- Checkpoint demo ---------------- */
+  const log = $('#log'), time = () => new Date().toTimeString().slice(0, 8);
+  function addLog(who, msg, sys = false) {
+    const li = document.createElement('li');
+    li.innerHTML = sys ? `<span class="sys">${msg}</span>` : `<span class="t">${time()}</span>  <span class="who">${who}</span>  ${msg}`;
+    log.appendChild(li); log.parentElement.scrollTop = log.parentElement.scrollHeight;
+  }
+  addLog('AI reader ', 'suggested 6 rules from 5 sources');
+  addLog('AI checker', 'found all 6 quotes in the law · flagged a disagreement on OBL-03');
+  const rows = $$('.g-row');
+  function updateGate() {
+    const decided = rows.filter(r => ['approved', 'rejected'].includes(r.dataset.state)).length;
+    $('#gateCount').textContent = `${decided} of ${rows.length} decided`;
+    $$('#gateSegs span').forEach((s, i) => s.classList.toggle('on', i < decided));
+    const g = $('#gate'), was = g.classList.contains('complete'), done = decided === rows.length;
+    g.classList.toggle('complete', done);
+    if (done && !was) addLog('system    ', 'checkpoint 1 complete');
+  }
+  function setState(row, state, label) {
+    row.dataset.state = state; $('.g-state', row).innerHTML = label;
+    const decided = state === 'approved' || state === 'rejected';
+    $$('.g-actions button', row).forEach(b => b.disabled = decided || state === 'reverifying');
+    $$('.resolve input', row).forEach(i => i.disabled = decided);
+    if (state === 'pending' && row.hasAttribute('data-conflict')) $('[data-act="approve"]', row).disabled = !$('.resolve input:checked', row);
+    let ro = $('.ro-note', row);
+    if (state === 'rejected') { if (!ro) { ro = document.createElement('p'); ro.className = 'ro-note'; $('div', row).appendChild(ro); } ro.textContent = 'Locked until someone reopens it with a reason.'; }
+    else if (ro) ro.remove();
+    if (!reduce) { row.classList.add('flash'); setTimeout(() => row.classList.remove('flash'), 500); }
+    updateGate();
+  }
+  rows.forEach(row => {
+    const id = row.dataset.id, srcBtn = $('[data-src]', row), src = $('.g-src', row);
+    srcBtn.addEventListener('click', () => {
+      const open = src.hidden; src.hidden = !open; srcBtn.setAttribute('aria-expanded', open);
+      srcBtn.textContent = open ? 'Hide source' : 'Show source';
+      const m = $('mark.q', src); if (open) setTimeout(() => m.classList.add('lit'), 40); else m.classList.remove('lit');
+    });
+    $$('.resolve input', row).forEach(inp => inp.addEventListener('change', () => { const a = $('[data-act="approve"]', row); a.disabled = false; a.removeAttribute('title'); }));
+    const reason = $('.reason', row), rIn = $('input', reason), rOk = $('[data-confirm]', reason);
+    rIn.addEventListener('input', () => rOk.disabled = rIn.value.trim().length < 3);
+    $('[data-cancel]', reason).addEventListener('click', () => { reason.hidden = true; rIn.value = ''; rOk.disabled = true; });
+    rOk.addEventListener('click', () => { addLog('specialist', `rejected ${id} · reason: "${rIn.value.trim()}"`); reason.hidden = true; setState(row, 'rejected', 'Rejected'); });
+    row.addEventListener('click', e => {
+      const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+      if (b.dataset.act === 'approve') {
+        const pick = $('.resolve input:checked', row);
+        addLog('specialist', `approved ${id}${pick ? ' · follows ' + (pick.value === '6' ? 'the law (6 months)' : 'the practice guide (4 months)') : ''}`);
+        setState(row, 'approved', 'Approved');
+      }
+      if (b.dataset.act === 'reject') { reason.hidden = false; rIn.focus(); }
+      if (b.dataset.act === 'edit') {
+        addLog('specialist', `edited ${id} · sent back to the checker`);
+        setState(row, 'reverifying', '<span class="spinner" aria-hidden="true"></span>Re-checking');
+        setTimeout(() => { addLog('AI checker', `re-checked ${id} · quote found in the law`); setState(row, 'pending', 'Waiting · re-checked'); }, reduce ? 200 : 1200);
+      }
+    });
+  });
+  $('#resetDemo').addEventListener('click', () => {
+    rows.forEach(row => { $$('.resolve input', row).forEach(i => i.checked = false); const r = $('.reason', row); r.hidden = true; $('input', r).value = ''; setState(row, 'pending', 'Waiting'); });
+    addLog('', 'Demo reset. Earlier entries stay, because nothing in this log can be deleted.', true);
+  });
+
+  /* ---------------- Code tabs + copy ---------------- */
+  const tabs = $$('.code [role="tab"]');
+  tabs.forEach(t => t.addEventListener('click', () => tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; document.getElementById(x.getAttribute('aria-controls')).hidden = !on; })));
+  $('[data-copy]').addEventListener('click', e => {
+    const pre = $$('.code pre').find(p => !p.hidden); navigator.clipboard?.writeText(pre.innerText).catch(() => {});
+    const b = e.currentTarget; b.textContent = 'Copied ✓'; setTimeout(() => b.textContent = 'Copy', 1500);
+  });
+
+  /* ---------------- Date demo ---------------- */
+  function renderCal() {
+    const rule = $('input[name="roll"]:checked').value, dow = d => new Date(2027, 0, d).getDay();
+    let html = ['M','T','W','T','F','S','S'].map(d => `<span class="dow">${d}</span>`).join('');
+    for (let i = 0; i < (dow(1) + 6) % 7; i++) html += '<span></span>';
+    let due = 10; if (rule === 'roll') while ([0, 6].includes(dow(due))) due++;
+    for (let d = 1; d <= 31; d++) {
+      const c = ['d']; if ([0, 6].includes(dow(d))) c.push('we');
+      if (d === 10) c.push('calc-day'); if (d === 10 && due !== 10) c.push('rolled'); if (d === due) c.push('due');
+      html += `<span class="${c.join(' ')}">${d}</span>`;
+    }
+    $('#calGrid').innerHTML = html;
+    $('#dueOut').textContent = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dow(due)]} ${due} Jan 2027`;
+    $('#rollNote').textContent = rule === 'roll' ? 'Sunday isn’t a working day, so the deadline moves to Monday.' : 'This rule keeps the deadline where it falls, even on a weekend. Tax deadlines work this way.';
+  }
+  $$('input[name="roll"]').forEach(r => r.addEventListener('change', renderCal));
+
+  /* ---------------- Design notes: pins + panel ---------------- */
+  const pins = $('#pins'), hl = $('#hl'), list = $('#notesList');
+  let noted = [], pinned = -1;
+  function toggleNotes(force) {
+    const on = document.body.classList.toggle('notes-on', force);
+    $('#notesBtn').setAttribute('aria-pressed', on);
+    pinned = -1; buildNotes();
+  }
+  $('#notesBtn').addEventListener('click', () => toggleNotes());
+  $('#notesClose').addEventListener('click', () => toggleNotes(false));
+  function buildNotes() {
+    pins.innerHTML = ''; list.innerHTML = ''; hl.classList.remove('show'); pinned = -1;
+    if (!document.body.classList.contains('notes-on')) return;
+    noted = $$('[data-note]', currentView()).filter(el => el.offsetParent !== null);
+    $('#notesSub').textContent = `${currentView().dataset.title}: ${noted.length} notes. Hover a note to outline what it refers to.`;
+    noted.forEach((el, i) => {
+      const [title, text] = el.dataset.note.split('|');
+      const p = document.createElement('button');
+      p.className = 'pin'; p.textContent = i + 1; p.setAttribute('aria-label', `Design note ${i + 1}: ${title}`);
+      p.addEventListener('click', () => focusNote(i, false));
+      p.addEventListener('mouseenter', () => highlight(i)); p.addEventListener('mouseleave', unhighlight);
+      pins.appendChild(p);
+      const li = document.createElement('li');
+      li.innerHTML = `<button><span class="num">${i + 1}</span><span><b>${title}</b><span class="t">${text}</span></span></button>`;
+      const b = $('button', li);
+      b.addEventListener('mouseenter', () => highlight(i)); b.addEventListener('mouseleave', unhighlight);
+      b.addEventListener('focus', () => highlight(i)); b.addEventListener('click', () => focusNote(i, true));
+      list.appendChild(li);
+    });
+    positionPins();
+  }
+  const rectOf = el => { const r = el.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; };
+  function positionPins() {
+    if (!document.body.classList.contains('notes-on')) return;
+    const kids = [...pins.children];
+    noted.forEach((el, i) => {
+      const r = rectOf(el), pin = kids[i]; if (!pin) return;
+      const outside = r.x >= 40;            // room in the gutter? put the pin there
+      pin.style.left = (outside ? r.x - 34 : r.x + 6) + 'px';
+      pin.style.top = (outside ? r.y : r.y + 6) + 'px';
+    });
+    if (pinned >= 0) highlight(pinned);
+  }
+  function highlight(i) {
+    const r = rectOf(noted[i]);
+    Object.assign(hl.style, { left: (r.x - 6) + 'px', top: (r.y - 6) + 'px', width: (r.w + 12) + 'px', height: (r.h + 12) + 'px' });
+    hl.classList.add('show');
+    [...pins.children].forEach((p, k) => p.classList.toggle('on', k === i));
+    $$('#notesList button').forEach((b, k) => b.classList.toggle('on', k === i));
+  }
+  function unhighlight() {
+    if (pinned >= 0) return highlight(pinned);
+    hl.classList.remove('show');
+    [...pins.children].forEach(p => p.classList.remove('on'));
+    $$('#notesList button').forEach(b => b.classList.remove('on'));
+  }
+  function focusNote(i, scrollPage) {
+    pinned = i; highlight(i);
+    if (scrollPage) noted[i].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+    $$('#notesList li')[i].scrollIntoView({ block: 'nearest' });
+  }
+  new ResizeObserver(() => { positionPins(); placeMarginNotes(); }).observe(document.body);
+  addEventListener('resize', () => { positionPins(); placeMarginNotes(); });
+  document.fonts && document.fonts.ready.then(() => { positionPins(); placeMarginNotes(); });
+
+  /* ---------------- Start ---------------- */
+  const start = location.hash.replace('#', '');
+  show(['ch01', 'ch02'].includes(start) ? start : 'cover', false);
+  if (params.has('notes')) toggleNotes(true);
+  if (params.get('y')) setTimeout(() => { scrollTo({ top: +params.get('y'), behavior: 'instant' }); }, 400);
+})();
+</script>
+</body>
+</html>

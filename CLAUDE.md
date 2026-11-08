@@ -23,9 +23,13 @@ This repository is **public**. Anything committed should be treated as published
 1. **Real-name scan** (must print nothing). It reads the private list kept in the capstone repo. If
    that file is missing, stop and ask; do not skip the scan.
 
+   One exception, decided by the operator on 2026-11-08: the operator's own first name ("Millie") is
+   allowed here, because the portfolio carries their name. The exception applies to this repo only.
+   Do not add other exceptions without asking.
+
    ```bash
    grep -rniwF --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=.astro \
-     -f <(grep -vE '^(#|$)' ../capstone/reference/real-identifiers.txt) .
+     -f <(grep -vE '^(#|$)' ../capstone/reference/real-identifiers.txt | grep -vixF 'Millie') .
    ```
 
 2. **Build** must pass: `npm run build`
