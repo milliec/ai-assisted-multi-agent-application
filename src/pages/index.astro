@@ -1,16 +1,45 @@
 ---
+// Cover page: a simple holding version while the site is being built.
+// Copy comes from the approved mockup (design/approved-mockup.html).
+import Base from '../layouts/Base.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base title="AI-Assisted Multi-Agent Application Development · Case study">
+  <header class="mx-auto flex h-21 max-w-[1200px] items-center justify-between px-4 md:px-10">
+    <a href="/" class="flex flex-col leading-tight text-graphite no-underline">
+      <span class="font-display text-[18px] tracking-[-0.02em]">Millie Chan</span>
+      <span class="text-[12px] text-steel">Product designer</span>
+    </a>
+    <span class="hidden font-display text-[13px] text-steel sm:block">Case study · AI for fund compliance</span>
+  </header>
+
+  <main class="mx-auto max-w-[1200px] px-4 pt-10 pb-20 md:px-10">
+    <p class="font-display text-[13px] text-brass">
+      Case study <span class="font-mono">[2026]</span> · Work in progress · All data is fictional
+    </p>
+
+    <h1 class="mt-7 max-w-[13em] text-[clamp(38px,4.5vw,56px)] leading-[0.98]">
+      AI agents draft a fund’s reporting calendar. A human specialist approves every rule.
+    </h1>
+
+    <p class="mt-7 max-w-[32em] text-subheading leading-[1.45] text-steel">
+      Investment funds must send regular reports to government regulators, each by a deadline set in
+      law. My tool uses AI to read those laws and draft the deadlines, quoting the exact sentence each
+      one comes from. A human compliance specialist checks and approves the work at three points, and
+      plain code works out the final dates.
+    </p>
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a
+        href="/system"
+        class="inline-flex items-center gap-2 border border-graphite bg-graphite px-5 py-3 font-display text-[16px] tracking-[-0.02em] text-white transition-colors hover:bg-black"
+      >
+        See the design system <span aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <p class="mt-15 max-w-[40em] rounded-asym bg-ivory p-6 text-caption text-steel">
+      The full case study is being built. Chapters are added at the end of each phase of the project.
+    </p>
+  </main>
+</Base>
