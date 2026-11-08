@@ -44,7 +44,7 @@ const { n, title, lede, readingTime, phase, glance, toc, next } = Astro.props;
 
         <!-- Design note: three numbers sum up the chapter before you read it,
              and fill the space beside the title. -->
-        <dl class="glance">
+        <dl class="glance" data-note="At a glance|Three numbers sum up the chapter before you read it, and fill the space beside the title.">
           {glance.map((g) => (
             <div><dt>{g.value}</dt><dd>{g.label}</dd></div>
           ))}
@@ -54,7 +54,7 @@ const { n, title, lede, readingTime, phase, glance, toc, next } = Astro.props;
 
     <!-- ============ Reader: menu + article ============ -->
     <div class="reader mx-auto max-w-[1200px] px-4 md:px-10">
-      <nav class="toc" aria-label="On this page">
+      <nav class="toc" aria-label="On this page" data-note="Contents|Stays on screen while you read. The ember bar marks the current section, and a dark line fills as you go.">
         <p class="mb-3.5 font-display text-[13px] leading-[1.38] tracking-[-0.01em] text-brass">On this page</p>
         <ol>
           {toc.map((item, i) => (

@@ -63,7 +63,7 @@ const phases: { name: string; roles: [string, Status][] }[] = [
 
     <!-- Design note: adapts a partner-logo strip. Status is honest: only one agent has done its
          work so far. -->
-    <div class="grid gap-2.5">
+    <div data-note="Development crew|Adapts a partner-logo strip. Status is honest: only one agent has done its work so far." class="grid gap-2.5">
       {phases.map((phase) => (
         <div class="grid items-center gap-2.5 rounded-lg bg-fog px-[18px] py-3.5 sm:grid-cols-[120px_1fr] sm:gap-5">
           <h3 class="text-[16px]">{phase.name}</h3>

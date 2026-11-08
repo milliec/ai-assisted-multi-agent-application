@@ -1,0 +1,198 @@
+---
+// Design notes overlay: numbered pins on the page + a side panel explaining design decisions.
+// Turned on by the "Design notes" button in the glass pill (NavPill.astro), or by adding
+// ?notes to any page's address (handy for sending a reviewer straight to the notes).
+//
+// How a note is written: put data-note="Title|Explanation" on the element it describes.
+// The pins and outline live in their own layer and never change the styles of the
+// elements they describe. Matches design/approved-mockup.html.
+---
+
+<div id="dn-pins"></div>
+<div id="dn-hl" aria-hidden="true"></div>
+
+<aside class="dn-panel" id="dn-panel" aria-labelledby="dn-title">
+  <header>
+    <div>
+      <h2 id="dn-title" tabindex="-1">Design notes</h2>
+      <p id="dn-sub">Why this page looks and works the way it does.</p>
+    </div>
+    <button type="button" class="dn-close" id="dn-close" aria-label="Close design notes">×</button>
+  </header>
+  <ol id="dn-list"></ol>
+</aside>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-notes-btn]');
+  const panel = document.getElementById('dn-panel')!;
+  const pins = document.getElementById('dn-pins')!;
+  const hl = document.getElementById('dn-hl')!;
+  const list = document.getElementById('dn-list')!;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let noted: HTMLElement[] = []; // the elements that carry a note
+  let pinned = -1;               // the note last clicked, which stays outlined
+
+  const isOn = () => document.body.classList.contains('notes-on');
+
+  // ---------- Turn notes on or off ----------
+  function setOn(on: boolean) {
+    document.body.classList.toggle('notes-on', on);
+    btn?.setAttribute('aria-pressed', String(on));
+    build();
+    if (on) document.getElementById('dn-title')!.focus({ preventScroll: true }); // keyboard users land in the panel
+    else btn?.focus({ preventScroll: true });
+  }
+  btn?.addEventListener('click', () => setOn(!isOn()));
+  document.getElementById('dn-close')!.addEventListener('click', () => setOn(false));
+  document.addEventListener('keydown', (e) => {
+    // Escape closes notes, unless the chapter menu is open (it closes first)
+    if (e.key === 'Escape' && isOn() && !document.querySelector('[data-chmenu].open')) setOn(false);
+  });
+
+  // ---------- Build the pins and the list ----------
+  function build() {
+    pins.replaceChildren();
+    list.replaceChildren();
+    hl.classList.remove('show');
+    pinned = -1;
+    if (!isOn()) return;
+
+    // Only notes on elements that are visible right now (e.g. the contents menu is hidden on phones)
+    noted = [...document.querySelectorAll<HTMLElement>('[data-note]')].filter((el) => el.offsetParent !== null);
+    document.getElementById('dn-sub')!.textContent =
+      `${noted.length} notes on this page. Hover or focus a note to outline what it refers to.`;
+
+    noted.forEach((el, i) => {
+      const [title, text] = (el.dataset.note ?? '').split('|');
+
+      // The numbered pin beside the element (textContent keeps it plain text)
+      const pin = document.createElement('button');
+      pin.type = 'button';
+      pin.className = 'dn-pin';
+      pin.textContent = String(i + 1);
+      pin.setAttribute('aria-label', `Design note ${i + 1}: ${title}`);
+      pin.addEventListener('click', () => focusNote(i, false));
+      pin.addEventListener('mouseenter', () => highlight(i));
+      pin.addEventListener('mouseleave', unhighlight);
+      pins.appendChild(pin);
+
+      // The matching item in the panel
+      const li = document.createElement('li');
+      const item = document.createElement('button');
+      item.type = 'button';
+      const num = document.createElement('span'); num.className = 'dn-num'; num.textContent = String(i + 1);
+      const body = document.createElement('span');
+      const b = document.createElement('b'); b.textContent = title;
+      const t = document.createElement('span'); t.className = 'dn-t'; t.textContent = text ?? '';
+      body.append(b, t);
+      item.append(num, body);
+      item.addEventListener('mouseenter', () => highlight(i));
+      item.addEventListener('mouseleave', unhighlight);
+      item.addEventListener('focus', () => highlight(i));
+      item.addEventListener('blur', unhighlight);
+      item.addEventListener('click', () => focusNote(i, true));
+      li.appendChild(item);
+      list.appendChild(li);
+    });
+    positionPins();
+  }
+
+  // ---------- Positions (in page coordinates, so pins scroll with the page) ----------
+  const rectOf = (el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height };
+  };
+  function positionPins() {
+    if (!isOn()) return;
+    [...pins.children].forEach((pin, i) => {
+      const r = rectOf(noted[i]);
+      const roomOutside = r.x >= 40; // room in the left margin? put the pin there, else just inside
+      (pin as HTMLElement).style.left = `${roomOutside ? r.x - 34 : r.x + 6}px`;
+      (pin as HTMLElement).style.top = `${roomOutside ? r.y : r.y + 6}px`;
+    });
+    if (pinned >= 0) highlight(pinned);
+  }
+
+  // ---------- Outline one noted element ----------
+  function highlight(i: number) {
+    const r = rectOf(noted[i]);
+    Object.assign(hl.style, { left: `${r.x - 6}px`, top: `${r.y - 6}px`, width: `${r.w + 12}px`, height: `${r.h + 12}px` });
+    hl.classList.add('show');
+    [...pins.children].forEach((p, k) => p.classList.toggle('on', k === i));
+    list.querySelectorAll('button').forEach((b, k) => b.classList.toggle('on', k === i));
+  }
+  function unhighlight() {
+    if (pinned >= 0) return highlight(pinned);
+    hl.classList.remove('show');
+    [...pins.children].forEach((p) => p.classList.remove('on'));
+    list.querySelectorAll('button').forEach((b) => b.classList.remove('on'));
+  }
+  function focusNote(i: number, scrollPage: boolean) {
+    pinned = i;
+    highlight(i);
+    if (scrollPage) noted[i].scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    list.querySelectorAll('li')[i]?.scrollIntoView({ block: 'nearest' });
+  }
+
+  // Keep pins in place when the layout changes (window resized, panel pushes the page, fonts load)
+  new ResizeObserver(positionPins).observe(document.body);
+  addEventListener('resize', positionPins);
+  document.body.addEventListener('transitionend', (e) => { if (e.target === document.body) positionPins(); });
+  document.fonts?.ready.then(positionPins);
+
+  // Open straight away if the address has ?notes
+  if (new URLSearchParams(location.search).has('notes')) setOn(true);
+</script>
+
+<style is:global>
+  /* Pins and outline sit in their own layer above the page */
+  #dn-pins { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 60; }
+  .dn-pin {
+    position: absolute; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+    background: var(--color-brass); color: #fff; font: 500 11px/24px var(--font-mono); text-align: center;
+    box-shadow: 0 0 0 3px var(--color-canvas-white);
+  }
+  .dn-pin:hover, .dn-pin.on { background: var(--color-graphite); }
+  #dn-hl {
+    position: absolute; z-index: 59; pointer-events: none; opacity: 0;
+    border: 1.5px dashed var(--color-brass); border-radius: 10px; transition: opacity 160ms;
+  }
+  #dn-hl.show { opacity: 1; }
+
+  /* The panel: off screen until notes are on */
+  .dn-panel {
+    position: fixed; z-index: 85; right: 16px; top: 16px; bottom: 84px; width: 340px;
+    display: flex; flex-direction: column; border-radius: 20px;
+    background: var(--color-canvas-white); box-shadow: 0 0 0 1px var(--color-mist), 0 16px 40px -12px rgba(32, 32, 32, 0.18);
+    transform: translateX(calc(100% + 24px)); visibility: hidden;
+    transition: transform 320ms var(--ease-out-soft), visibility 0s linear 320ms;
+  }
+  body.notes-on .dn-panel { transform: none; visibility: visible; transition-delay: 0s; }
+  /* Wide screens: the panel pushes the page aside instead of covering it */
+  @media (min-width: 1101px) {
+    body { transition: padding-right 320ms var(--ease-out-soft); }
+    body.notes-on { padding-right: 372px; }
+    body.notes-on .navpill, body.notes-on .chmenu { left: calc(50% - 186px); }
+  }
+  /* Phones: a sheet that slides up from the bottom */
+  @media (max-width: 760px) {
+    .dn-panel { left: 8px; right: 8px; top: auto; bottom: 80px; width: auto; height: 44vh; transform: translateY(calc(100% + 100px)); }
+  }
+
+  .dn-panel header { display: flex; justify-content: space-between; align-items: start; gap: 12px; padding: 20px 20px 12px; }
+  .dn-panel h2 { font-size: 20px; }
+  .dn-panel h2:focus { outline: none; }
+  .dn-panel header p { margin-top: 4px; font-size: 13px; line-height: 1.4; color: var(--color-steel); }
+  .dn-close { flex: none; width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--color-fog); cursor: pointer; font-size: 16px; }
+  #dn-list { overflow: auto; padding: 0 12px 16px; }
+  #dn-list button {
+    display: grid; grid-template-columns: 28px 1fr; gap: 10px; width: 100%; padding: 12px 10px;
+    border: 0; border-radius: 12px; background: none; cursor: pointer; text-align: left;
+    font: 400 14px/1.45 var(--font-sans); color: var(--color-graphite); transition: background 160ms;
+  }
+  #dn-list button:hover, #dn-list button.on { background: var(--color-fog); }
+  .dn-num { width: 22px; height: 22px; border-radius: 50%; background: var(--color-brass); color: #fff; font: 500 11px/22px var(--font-mono); text-align: center; }
+  #dn-list b { display: block; margin-bottom: 2px; font: 400 15px var(--font-display); letter-spacing: -0.01em; }
+  .dn-t { color: var(--color-steel); }
+</style>

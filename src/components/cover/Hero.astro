@@ -27,7 +27,7 @@ const stack = [
 
       <!-- Design note: two plain statements of what the product does, written for someone
            outside finance. Display face at weight 400, never bold. -->
-      <h1 class="mb-7 text-[clamp(38px,4.5vw,56px)] leading-[0.98]">
+      <h1 data-note="Headline|Two plain statements of what the product does, written for someone outside finance. Display face at weight 400, never bold." class="mb-7 text-[clamp(38px,4.5vw,56px)] leading-[0.98]">
         AI agents draft a fund’s reporting calendar. A human specialist approves every rule.
       </h1>
 
@@ -47,7 +47,7 @@ const stack = [
 
       <!-- Design note: the role names both crews in plain words. The stack separates what is
            decided from what is planned, so nothing is overstated. -->
-      <dl class="mt-12 grid gap-5 gap-y-6 sm:grid-cols-[1fr_150px]">
+      <dl data-note="Project facts|The role names both crews in plain words. The stack separates what is decided from what is planned, so nothing is overstated." class="mt-12 grid gap-5 gap-y-6 sm:grid-cols-[1fr_150px]">
         <div>
           <dt class="mb-1.5 font-display text-[13px] text-brass">Role</dt>
           <dd class="text-caption">
@@ -78,7 +78,7 @@ const stack = [
     <!-- ============ Right: the data cards ============ -->
     <!-- Design note: the charts are the imagery. Each card shows real data from the answer key,
          on the ivory paper surface. -->
-    <div class="rounded-asym bg-ivory p-4 md:px-15 md:pt-14 md:pb-16">
+    <div data-note="Hero imagery|Charts are the imagery. The calendar and the ‘sources disagree’ card use the answer key’s data. The ‘4 of 6’ ring is an example of a review in progress, and is labelled as one." class="rounded-asym bg-ivory p-4 md:px-15 md:pt-14 md:pb-16">
       <div class="grid gap-2.5 md:grid-cols-2 md:gap-0">
 
         <!-- Card 1: the 2027 calendar (full width; extra bottom padding makes room for the overlap) -->
@@ -116,8 +116,11 @@ const stack = [
           </div>
         </div>
 
-        <!-- Card 3: review progress (overlaps the calendar's bottom-right corner) -->
+        <!-- Card 3: review progress (overlaps the calendar's bottom-right corner).
+             Not from the capstone's documents: an invented snapshot of a review in progress,
+             so it is labelled "Example". -->
         <div class="overlap relative z-2 rounded-2xl bg-canvas-white p-6 md:col-start-2 md:row-start-2 md:-mr-7 md:ml-2.5">
+          <span class="mb-3 inline-block rounded-2xl bg-fog px-2 py-1 text-[11px] leading-none font-medium text-steel">Example</span>
           <div class="flex items-center gap-3.5">
             <svg width="60" height="60" viewBox="0 0 64 64" aria-hidden="true" class="shrink-0">
               <circle cx="32" cy="32" r="26" fill="none" stroke="var(--color-fog)" stroke-width="6" />
@@ -126,7 +129,7 @@ const stack = [
             </svg>
             <div>
               <b class="mb-1 block font-display text-[26px] leading-none font-normal tracking-[-0.02em]">4 of 6</b>
-              <p class="text-[13px] leading-[1.4] text-steel">rules approved or rejected by a person</p>
+              <p class="text-[13px] leading-[1.4] text-steel">rules approved or rejected by a human specialist</p>
             </div>
           </div>
         </div>
