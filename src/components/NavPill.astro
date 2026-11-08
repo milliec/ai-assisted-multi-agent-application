@@ -1,0 +1,145 @@
+---
+// The glass navigation pill: the site's ONLY navigation (no top nav, by design).
+// Cover · Chapters ▲ (opens the chapter menu). On chapter pages, a thin ember line along the
+// bottom of the pill shows reading progress. Matches design/approved-mockup.html.
+// The chapter list comes from src/data/chapters.ts, the same list the cover uses.
+import { chapters, statusLabel } from '../data/chapters';
+
+// Which page are we on? '/' is the cover; '/chapters/01' is chapter 01.
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const onCover = path === '/';
+const current = chapters.find((c) => c.href && path === c.href);
+---
+
+<nav class="navpill" aria-label="Site" data-navpill>
+  <a href="/" class="pill-btn" aria-current={onCover ? 'page' : undefined}>Cover</a>
+  <button type="button" class="pill-btn" data-ch-btn aria-expanded="false" aria-controls="chmenu">
+    <span>{current ? `Chapter ${current.n}` : 'Chapters'}</span><span class="caret" aria-hidden="true">▲</span>
+  </button>
+  {current && <span class="navprog" aria-hidden="true"><i data-navprog></i></span>}
+</nav>
+
+<!-- Chapter menu: opens upwards from the pill -->
+<div class="chmenu" id="chmenu" data-chmenu>
+  <p class="chmenu-title">Chapters</p>
+  <ol>
+    {chapters.map((c) =>
+      c.href ? (
+        <li>
+          <a href={c.href} aria-current={current?.n === c.n ? 'page' : undefined}>
+            <span class="n">[{c.n}]</span>{c.title}<span class="s">{statusLabel[c.status].short}</span>
+          </a>
+        </li>
+      ) : (
+        <li>
+          <span class="off"><span class="n">[{c.n}]</span>{c.title}<span class="s">{statusLabel[c.status].short}</span></span>
+        </li>
+      )
+    )}
+  </ol>
+</div>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-ch-btn]');
+  const menu = document.querySelector<HTMLElement>('[data-chmenu]');
+  if (btn && menu) {
+    const setOpen = (open: boolean) => {
+      menu.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+      // Move keyboard focus into the menu when it opens
+      if (open) setTimeout(() => menu.querySelector<HTMLElement>('a')?.focus(), 30);
+    };
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpen(!menu.classList.contains('open'));
+    });
+    // Close on a click anywhere else
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target as Node) && !btn.contains(e.target as Node)) setOpen(false);
+    });
+    // Close on Escape and put focus back on the button
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.classList.contains('open')) { setOpen(false); btn.focus(); }
+    });
+  }
+
+  // Reading progress on chapter pages: 0 at the start of the article, 1 at the end
+  const bar = document.querySelector<HTMLElement>('[data-navprog]');
+  const article = document.querySelector<HTMLElement>('.article');
+  if (bar && article) {
+    const update = () => {
+      const r = article.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (innerHeight * 0.35 - r.top) / r.height));
+      bar.style.setProperty('--p', p.toFixed(3));
+    };
+    addEventListener('scroll', update, { passive: true });
+    update();
+  }
+</script>
+
+<style>
+  /* ---------- The pill ---------- */
+  .navpill {
+    position: fixed; left: 50%; bottom: 20px; z-index: 80; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 2px; padding: 5px; border-radius: 200px;
+    /* Glass: see-through white that blurs and brightens what's behind it */
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    /* Deliberate exception to "no shadows": a floating control needs lift to stand out on every background */
+    box-shadow: 0 0 0 0.5px rgba(32, 32, 32, 0.14), 0 10px 30px -6px rgba(32, 32, 32, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  .pill-btn {
+    position: relative; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    padding: 11px 16px; border: 0; border-radius: 200px; background: none; cursor: pointer;
+    font: 400 15px/1 var(--font-display); letter-spacing: -0.02em; color: var(--color-graphite); text-decoration: none;
+    transition: background 160ms var(--ease-out-soft);
+  }
+  .pill-btn:hover { background: rgba(255, 255, 255, 0.55); }
+  .pill-btn[aria-current="page"], .pill-btn[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 1px 3px rgba(32, 32, 32, 0.1), 0 0 0 0.5px rgba(32, 32, 32, 0.06);
+  }
+  .caret { font-size: 9px; transition: transform 160ms var(--ease-out-soft); }
+  [aria-expanded="true"] .caret { transform: rotate(180deg); }
+  @media (max-width: 420px) { .pill-btn { padding: 10px 11px; font-size: 14px; } }
+
+  /* Reading progress: a 2px ember line inside the bottom of the pill */
+  .navprog { position: absolute; left: 24px; right: 24px; bottom: 2px; height: 2px; overflow: hidden; pointer-events: none; }
+  .navprog i { display: block; width: 100%; height: 100%; background: var(--color-ember); transform-origin: left; transform: scaleX(var(--p, 0)); }
+
+  /* ---------- The chapter menu ---------- */
+  .chmenu {
+    position: fixed; left: 50%; bottom: 78px; z-index: 81; transform: translate(-50%, 8px);
+    width: min(440px, calc(100vw - 32px)); padding: 10px; border-radius: 20px;
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 0 0.5px rgba(32, 32, 32, 0.14), 0 16px 40px -10px rgba(32, 32, 32, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    opacity: 0; visibility: hidden;
+    transition: opacity 160ms var(--ease-out-soft), transform 160ms var(--ease-out-soft), visibility 0s linear 160ms;
+  }
+  .chmenu.open { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition-delay: 0s; }
+  .chmenu-title { margin: 8px 12px; font: 400 13px var(--font-display); color: var(--color-brass); }
+  .chmenu a, .chmenu .off {
+    display: grid; grid-template-columns: 40px 1fr auto; gap: 8px; align-items: center;
+    padding: 10px 12px; border-radius: 12px; text-decoration: none;
+    font: 400 15px var(--font-display); color: var(--color-graphite);
+  }
+  .chmenu a:hover, .chmenu a:focus-visible { background: rgba(255, 255, 255, 0.7); }
+  .chmenu a[aria-current="page"] { background: var(--color-ivory); }
+  .chmenu .off { color: var(--color-steel); }
+  .n { font: 400 12px var(--font-mono); color: var(--color-brass); }
+  .off .n { color: var(--color-steel); }
+  /* On the ivory "you are here" row, brass is too faint for small text */
+  [aria-current="page"] .n { color: var(--color-graphite); }
+  .s { font: 500 11px var(--font-sans); color: var(--color-steel); }
+
+  /* Fallbacks: no blur support, or the visitor asked for less transparency */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .navpill, .chmenu { background: #fff; }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .navpill, .chmenu { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  }
+</style>
