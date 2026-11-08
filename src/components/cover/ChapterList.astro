@@ -14,7 +14,7 @@ import { chapters, statusLabel } from '../../data/chapters';
       <p class="text-caption text-steel">A new chapter is added at the end of each phase.</p>
     </div>
 
-    <ol class="grid gap-2">
+    <ol data-note="Chapters|Reads like a report’s contents page. Unwritten chapters stay visible but aren’t clickable, so nothing leads to a dead end." class="grid gap-2">
       {chapters.map((ch) => {
         // Written chapters are links; the rest are plain boxes. Same layout either way.
         const Tag = ch.href ? 'a' : 'div';

@@ -30,7 +30,7 @@ const rules = [
 ];
 ---
 
-<div class="stage wide" data-date-demo>
+<div class="stage wide" data-date-demo data-note="Date demo|A simulation of the planned date code. The visitor changes the weekend rule, and the same input always gives the same answer. No AI involved.">
   <div class="mb-[18px] flex flex-wrap items-center justify-between gap-3">
     <p class="font-display text-[13px] leading-[1.38] tracking-[-0.01em] text-brass">Simulation · the planned date code · monthly report for December 2026</p>
     <span class="tag">No AI involved</span>
@@ -48,7 +48,7 @@ const rules = [
           {rules.map((r, i) => (
             <label>
               <input type="radio" name="weekend-rule" value={r.value} checked={i === 0}
-                data-due={r.due} data-due-text={r.dueText} data-note={r.note} />
+                data-due={r.due} data-due-text={r.dueText} data-rule-note={r.note} />
               <span>{r.label}</span>
             </label>
           ))}
@@ -96,7 +96,7 @@ const rules = [
     const update = (input: HTMLInputElement) => {
       const due = Number(input.dataset.due);
       demo.querySelector('[data-due-out]')!.textContent = input.dataset.dueText!;
-      demo.querySelector('[data-note-out]')!.textContent = input.dataset.note!;
+      demo.querySelector('[data-note-out]')!.textContent = input.dataset.ruleNote!;
       (demo.querySelector('[data-flag]') as HTMLElement).hidden = input.value !== 'unconfirmed';
       demo.querySelectorAll<HTMLElement>('[data-day]').forEach((cell) => {
         const day = Number(cell.dataset.day);

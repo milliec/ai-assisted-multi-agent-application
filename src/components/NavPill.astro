@@ -16,6 +16,11 @@ const current = chapters.find((c) => c.href && path === c.href);
   <button type="button" class="pill-btn" data-ch-btn aria-expanded="false" aria-controls="chmenu">
     <span>{current ? `Chapter ${current.n}` : 'Chapters'}</span><span class="caret" aria-hidden="true">▲</span>
   </button>
+  <span class="sep" aria-hidden="true"></span>
+  <!-- Turns the design notes overlay on and off (see DesignNotes.astro) -->
+  <button type="button" class="pill-btn" data-notes-btn aria-pressed="false" aria-controls="dn-panel">
+    <span class="pin-dot" aria-hidden="true"></span>Design notes
+  </button>
   {current && <span class="navprog" aria-hidden="true"><i data-navprog></i></span>}
 </nav>
 
@@ -96,10 +101,14 @@ const current = chapters.find((c) => c.href && path === c.href);
     transition: background 160ms var(--ease-out-soft);
   }
   .pill-btn:hover { background: rgba(255, 255, 255, 0.55); }
-  .pill-btn[aria-current="page"], .pill-btn[aria-expanded="true"] {
+  .pill-btn[aria-current="page"], .pill-btn[aria-expanded="true"], .pill-btn[aria-pressed="true"] {
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 0 1px 3px rgba(32, 32, 32, 0.1), 0 0 0 0.5px rgba(32, 32, 32, 0.06);
   }
+  .sep { width: 1px; height: 18px; margin: 0 4px; background: rgba(32, 32, 32, 0.14); }
+  /* Brass ring that fills in when notes are on */
+  .pin-dot { width: 8px; height: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--color-brass); }
+  [aria-pressed="true"] .pin-dot { background: var(--color-brass); }
   .caret { font-size: 9px; transition: transform 160ms var(--ease-out-soft); }
   [aria-expanded="true"] .caret { transform: rotate(180deg); }
   @media (max-width: 420px) { .pill-btn { padding: 10px 11px; font-size: 14px; } }

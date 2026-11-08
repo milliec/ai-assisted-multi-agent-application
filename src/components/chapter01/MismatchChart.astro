@@ -18,7 +18,7 @@ const gaps: Gap[] = [
 const pos = (value: number, max: number) => `${((value / max) * 100).toFixed(1)}%`;
 ---
 
-<div class="dumb" data-reveal>
+<div class="dumb" data-reveal data-note="Mismatch chart|A dumbbell chart shows the size of each disagreement at a glance. Each row has its own scale, labelled underneath.">
   {gaps.map((g) => (
     <div class="drow">
       <div class="name">{g.name}<small>{g.measure}</small></div>
