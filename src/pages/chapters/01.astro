@@ -1,10 +1,12 @@
 ---
 // Chapter 01: Deadlines set by hand.
 // Text follows design/approved-mockup.html, corrected against the capstone's documents
-// (mainly project-context/1.define/mrd.md and prd.md). Visuals are added in the next PRs.
+// (mainly project-context/1.define/mrd.md and prd.md).
 import Chapter from '../../layouts/Chapter.astro';
 import Personas from '../../components/chapter01/Personas.astro';
 import JourneyMap from '../../components/chapter01/JourneyMap.astro';
+import MismatchChart from '../../components/chapter01/MismatchChart.astro';
+import RuleLayers from '../../components/chapter01/RuleLayers.astro';
 
 const toc = [
   { id: 'who-it-affects', label: 'Who it affects' },
@@ -52,7 +54,7 @@ const toc = [
       The team’s own documents give different answers for the same report. No check caught any of
       these.
     </p>
-    <!-- PR F: the disagreement chart and its caption -->
+    <MismatchChart />
   </section>
 
   <section id="why-the-answers-drift">
@@ -63,6 +65,6 @@ const toc = [
       the same report can be described differently in different places. The project’s test data covers
       several of these layers.
     </p>
-    <!-- PR F: the four rule layers -->
+    <RuleLayers />
   </section>
 </Chapter>

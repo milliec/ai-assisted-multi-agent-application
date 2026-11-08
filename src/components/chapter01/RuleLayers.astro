@@ -1,0 +1,63 @@
+---
+// Chapter 01, section 1.4: the four overlapping layers of rules behind one fund,
+// and which test reports sit in each.
+// Sources (capstone): project-context/1.define/mrd.md §2 (the layers; marked as background,
+// not legal reference) and mock-data/expected-obligation-library.md (the test reports).
+//
+// Design note: stacked bands show the overlap. Each test report sits in the layer it comes
+// from, linking the problem to the test data.
+
+const layers = [
+  {
+    name: 'Luxembourg fund law',
+    // The monthly report comes from a regulator's circular made under this law, not the law itself
+    text: 'The main law for this kind of fund (Law of 17 December 2010, Part II), and the regulator’s rules made under it.',
+    reports: ['Monthly report', 'Annual report'],
+  },
+  {
+    name: 'Fund-manager law',
+    text: 'Rules for the company that manages the fund, from Luxembourg and the EU.',
+    reports: [],
+  },
+  {
+    name: 'Other EU rules',
+    text: 'For example, rules on investor documents and on sustainability.',
+    reports: [],
+  },
+  {
+    name: 'Tax, ownership and cross-border rules',
+    text: 'Fund taxes, the register of who owns the fund, and reports in each country where it is sold.',
+    // The VAT return is a deliberate decoy in the test data: the right answer is "does not apply"
+    reports: ['Fund tax', 'Spain report', 'Ownership update', 'VAT return (test: does not apply)'],
+  },
+];
+---
+
+<div class="stage wide">
+  <ol class="grid gap-1.5" aria-label="Four layers of rules, with the test reports in each">
+    {layers.map((l) => (
+      <li class="layer">
+        <div>
+          <h3>{l.name}</h3>
+          <p>{l.text}</p>
+        </div>
+        <div class="flex flex-wrap gap-1.5 sm:justify-end">
+          {l.reports.length
+            ? l.reports.map((r) => <span class="chip">{r}</span>)
+            : <span class="text-[12px] text-steel">Not in the test data</span>}
+        </div>
+      </li>
+    ))}
+  </ol>
+</div>
+
+<style>
+  .layer {
+    display: grid; gap: 16px; align-items: center;
+    padding: 16px 20px; border-radius: 8px; background: var(--color-canvas-white);
+  }
+  @media (min-width: 640px) { .layer { grid-template-columns: 1fr auto; } }
+  .layer:first-child { border-radius: 6px 0 0 0; } /* the signature corner on the top band */
+  .layer h3 { margin-bottom: 2px; font: 400 16px var(--font-display); letter-spacing: -0.01em; }
+  .layer p { font-size: 13px; line-height: 1.4; color: var(--color-steel); }
+</style>
