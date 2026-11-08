@@ -169,8 +169,10 @@
     transition: transform 320ms var(--ease-out-soft), visibility 0s linear 320ms;
   }
   body.notes-on .dn-panel { transform: none; visibility: visible; transition-delay: 0s; }
-  /* Wide screens: the panel pushes the page aside instead of covering it */
-  @media (min-width: 1101px) {
+  /* Very wide screens: the panel pushes the page aside instead of covering it.
+     Only from 1440px, so the page keeps at least ~1068px and its two-column layouts
+     don't get squashed. Narrower screens: the panel floats over the page instead. */
+  @media (min-width: 1440px) {
     body { transition: padding-right 320ms var(--ease-out-soft); }
     body.notes-on { padding-right: 372px; }
     body.notes-on .navpill, body.notes-on .chmenu { left: calc(50% - 186px); }
