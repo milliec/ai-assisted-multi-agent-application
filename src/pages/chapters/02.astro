@@ -2,10 +2,12 @@
 // Chapter 02: Who decides what.
 // Text follows design/approved-mockup.html, corrected against the capstone's documents
 // (mainly approval-map.md, system-description.md, the user stories and the mock data).
-// The two simulated demos and the "not sure" example are added in the next PRs.
+// The "not sure" example and the date demo are added in the next PR.
 import Chapter from '../../layouts/Chapter.astro';
 import Records from '../../components/chapter02/Records.astro';
 import PermissionsTable from '../../components/chapter02/PermissionsTable.astro';
+import CheckpointDemo from '../../components/chapter02/CheckpointDemo.astro';
+import DesignQuestion from '../../components/chapter02/DesignQuestion.astro';
 
 const toc = [
   { id: 'the-four-records', label: 'The four records' },
@@ -71,7 +73,12 @@ const leftOut = [
       button, and nothing is ticked in advance. Separate clicks encourage careful review, but they can’t
       prove it happened.
     </p>
-    <!-- Next PR: the simulated checkpoint 1 demo, its audit log, and the design question card -->
+    <p>
+      Try a simulated version of checkpoint 1 below, built for this page with the project’s test data.
+      The real screen hasn’t been built yet.
+    </p>
+    <CheckpointDemo />
+    <DesignQuestion />
   </section>
 
   <section id="when-not-sure-is-right">

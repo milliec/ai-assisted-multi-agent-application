@@ -1,0 +1,47 @@
+---
+// Chapter 02, section 2.3: a design question card.
+// Sources (capstone): docs/learning-notes.md (the "second way back" finding),
+// project-context/1.define/system-description.md FR-023, approval-map.md H4b,
+// user-stories/US-004 criterion 11.
+//
+// Design note: a reusable card for any chapter. The question, what I found, what changed,
+// and the files where the change is recorded. These are requirements, not built features.
+---
+
+<div class="dq">
+  <p class="mb-[18px] font-display text-[13px] leading-[1.38] tracking-[-0.01em] text-brass">Design question · Define phase</p>
+  <dl>
+    <div>
+      <dt>Question</dt>
+      <dd>Could a rejected rule sneak back onto the calendar without anyone deciding it should?</dd>
+    </div>
+    <div>
+      <dt>What I found</dt>
+      <dd>When I mapped every way a rule could come back, editing a rejected rule turned out to be a second way in, with no reason asked for.</dd>
+    </div>
+    <div>
+      <dt>What changed</dt>
+      <dd>The requirements now make rejected rules read-only. To change one, a human specialist has to reopen it and give a reason, and it goes through checkpoints 1 and 2 again.</dd>
+    </div>
+    <div>
+      <dt>Recorded in</dt>
+      <dd class="files">
+        <span>1.define/system-description.md · FR-023</span>
+        <span>1.define/approval-map.md · H4b</span>
+        <span>US-004 · criterion 11</span>
+      </dd>
+    </div>
+  </dl>
+</div>
+
+<style>
+  .dq { margin-top: 40px; padding: 32px 36px; border-radius: 6px 0 0 0; background: var(--color-ivory); }
+  @media (max-width: 720px) { .dq { padding: 22px 18px; } }
+  dl > div { display: grid; grid-template-columns: 140px 1fr; gap: 20px; padding: 14px 0; border-top: 1px solid var(--color-ivory-line); }
+  @media (max-width: 640px) { dl > div { grid-template-columns: 1fr; gap: 4px; } }
+  /* Small uppercase labels. Brass on ivory is too faint for 11px text, so these use graphite. */
+  dt { padding-top: 5px; font: 400 11px var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-graphite); }
+  dd { font: 400 18px/1.4 var(--font-display); letter-spacing: -0.01em; }
+  .files { display: flex; flex-wrap: wrap; gap: 6px; }
+  .files span { padding: 5px 9px; border-radius: 20px; background: var(--color-canvas-white); font: 400 12px/1 var(--font-mono); letter-spacing: 0; }
+</style>

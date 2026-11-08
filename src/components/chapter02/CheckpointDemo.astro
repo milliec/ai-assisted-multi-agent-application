@@ -1,0 +1,408 @@
+---
+// Chapter 02, section 2.3: a SIMULATED checkpoint 1, built for this page with the project's
+// test data. The real screen has not been built yet.
+//
+// Sources (capstone, project-context/1.define/):
+//   rules and filers ........ mock-data/expected-obligation-library.md (OBL-01, -03, -04)
+//   quotes .................. mock-data/mock-regulatory-sources.md (word for word)
+//   6 rules, 2 flags ........ expected-obligation-library.md §1, §3 (C-1 on OBL-03, C-2 on OBL-05)
+//   behaviour ............... user-stories/US-004 (reject needs a reason; approving over a
+//                             conflict flag needs a reason; G1 done only when all 6 decided),
+//                             US-005 (edit sends the row back for re-checking),
+//                             system-description.md FR-023 (rejected rows read-only until reopened),
+//                             approval-map.md A17 (log entries can't be deleted)
+//
+// Design note: there is no "approve all" to find. On the flagged rule, Approve stays disabled
+// until the visitor writes a reason, as the requirements say.
+
+interface Rule {
+  id: string;
+  title: string;
+  meta: string;
+  sourceId: string;
+  before: string; // source text before the quoted part
+  quote: string;  // the exact sentence the rule relies on
+  after: string;
+  conflict?: boolean;
+}
+
+const rules: Rule[] = [
+  {
+    id: 'OBL-01',
+    title: 'Monthly financial report',
+    meta: 'To the Luxembourg regulator (CSSF) · Due 10 days after each month ends · Sent by the fund administrator',
+    sourceId: 'SRC-CSSF15627-P2',
+    before: 'Each undertaking for collective investment within the scope of this circular shall transmit the monthly financial information report U1.1 to the CSSF ',
+    quote: 'no later than 10 calendar days after the end of each month',
+    after: '.',
+  },
+  {
+    id: 'OBL-03',
+    title: 'Audited annual report',
+    meta: 'To the Luxembourg regulator (CSSF) · Due 6 months after the financial year ends · Sent by the fund administrator, with the management company and auditor',
+    sourceId: 'SRC-UCILAW-P3 · the law itself',
+    before: 'An undertaking for collective investment subject to Part II of this law shall publish an audited annual report and file it with the CSSF ',
+    quote: 'within six months of the end of the period to which it relates',
+    after: '.',
+    conflict: true,
+  },
+  {
+    id: 'OBL-04',
+    title: 'Quarterly report for Spain',
+    meta: 'To the Spanish regulator (CNMV) · Due 2 months after each quarter ends · Sent by a local agent in Spain',
+    sourceId: 'SRC-CNMV-P1',
+    before: 'Foreign undertakings for collective investment registered with the CNMV for marketing in Spain shall submit statistical report A01 to the CNMV each quarter, ',
+    quote: 'within two months after the last calendar day of the quarter',
+    after: '.',
+  },
+];
+---
+
+<div class="stage wide" data-gate-demo>
+  <div class="mb-[18px] flex flex-wrap items-center justify-between gap-3">
+    <p class="font-display text-[13px] leading-[1.38] tracking-[-0.01em] text-brass">Simulation · checkpoint 1 with test data</p>
+    <span class="tag">3 of 6 rules shown</span>
+  </div>
+
+  <div class="gate">
+    <!-- ============ Header: title, counter, progress ============ -->
+    <div class="gate-head">
+      <div class="flex flex-wrap items-baseline justify-between gap-3">
+        <h3 class="text-[20px]">Checkpoint 1 · Approve rules</h3>
+        <span class="count" data-count aria-live="polite">0 of {rules.length} decided</span>
+      </div>
+      <div class="segs" aria-hidden="true">{rules.map(() => <span></span>)}</div>
+      <p class="gate-note">This step is finished only when every rule has a decision.</p>
+    </div>
+
+    <!-- ============ One row per rule ============ -->
+    {rules.map((r) => (
+      <div class="g-row" data-row data-id={r.id} data-state="pending" data-conflict={r.conflict ? '' : undefined}>
+        <div class="min-w-0">
+          <div class="g-head">
+            <span class="font-mono text-[12px]">{r.id}</span>
+            <span class="g-title">{r.title}</span>
+            <span class="g-state" data-state-label>Waiting</span>
+          </div>
+          <div class="g-meta">{r.meta}</div>
+
+          <div class="flex flex-wrap items-center gap-2.5 text-[13px]">
+            {r.conflict
+              ? <span class="chip chip-flag"><span aria-hidden="true">⚑</span>Two sources disagree</span>
+              : <span class="chip"><span aria-hidden="true">✓</span>Quote found in the law</span>}
+            <button type="button" class="linkbtn" data-src-btn aria-expanded="false" aria-controls={`src-${r.id}`}>Show source</button>
+          </div>
+
+          <div class="source" id={`src-${r.id}`} data-src hidden>
+            <span class="src-id">{r.sourceId}</span>
+            {r.before}<mark class="q">{r.quote}</mark>{r.after}
+          </div>
+
+          {r.conflict && (
+            <div class="resolve" data-resolve>
+              <p class="resolve-title">Flagged by the AI checker</p>
+              <p>
+                <!-- Kept on one line: a line break right before <strong> loses the space -->
+                The checker points out disagreements but never settles them. The law says <strong>6 months</strong>; a practice guide (someone’s summary of the law) says <strong>4 months</strong>.
+                To approve this rule as it stands, write down why. To use
+                4 months instead, a human specialist would edit the rule, and it would be checked again.
+              </p>
+              <label class="reason-label" for={`why-${r.id}`}>Reason for approving despite the flag (required)</label>
+              <input class="reason-input" id={`why-${r.id}`} type="text" data-approve-reason autocomplete="off" />
+            </div>
+          )}
+
+          <!-- Reject: a reason is always required -->
+          <div class="reject" data-reject hidden>
+            <label class="reason-label" for={`rej-${r.id}`}>Reason for rejecting (required)</label>
+            <div class="flex flex-wrap items-center gap-2">
+              <input class="reason-input" id={`rej-${r.id}`} type="text" data-reject-reason autocomplete="off" />
+              <button type="button" class="btn btn-primary" data-reject-confirm disabled>Reject</button>
+              <button type="button" class="linkbtn" data-reject-cancel>Cancel</button>
+            </div>
+          </div>
+
+          <p class="ro-note" data-ro hidden>Read-only until a human specialist reopens it with a reason.</p>
+        </div>
+
+        <div class="g-actions">
+          <button type="button" class="btn btn-primary" data-act="approve" disabled={r.conflict}>Approve</button>
+          <button type="button" class="btn btn-ghost" data-act="edit">Edit</button>
+          <button type="button" class="btn btn-ghost" data-act="reject">Reject</button>
+        </div>
+      </div>
+    ))}
+
+    <div class="gate-done" data-done role="status" hidden>
+      All 3 rules shown here are decided. In the real flow, checkpoint 1 finishes only when a human
+      specialist has decided all 6.
+    </div>
+  </div>
+
+  <!-- ============ Audit log ============ -->
+  <div class="log" data-log-box>
+    <div class="log-h"><span>audit log</span><span>entries can’t be deleted</span></div>
+    <ol data-log aria-live="polite" aria-label="Audit log entries"></ol>
+  </div>
+
+  <div class="stage-foot">
+    <span>Editing sends a rule back to be checked. Rejecting needs a reason. In the real screen, approving also sets the rule’s weekend rule.</span>
+    <button type="button" class="linkbtn" data-reset>Reset demo</button>
+  </div>
+</div>
+
+<script>
+  // ------------------------------------------------------------------
+  // The demo's behaviour. Everything happens inside the demo's own box.
+  // ------------------------------------------------------------------
+  const demo = document.querySelector<HTMLElement>('[data-gate-demo]');
+  if (demo) {
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = demo) => root.querySelector<T>(sel)!;
+    const $$ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = demo) => [...root.querySelectorAll<T>(sel)];
+    const rows = $$('[data-row]');
+    const log = $('[data-log]');
+
+    // --- Audit log: add a line (never remove one) ---
+    const now = () => new Date().toTimeString().slice(0, 8);
+    function addLog(who: string, message: string, systemNote = false) {
+      const li = document.createElement('li');
+      if (systemNote) {
+        li.className = 'sys';
+        li.textContent = message;
+      } else {
+        // Built with textContent, so whatever a visitor types is shown as plain text
+        const t = document.createElement('span'); t.className = 't'; t.textContent = now();
+        const w = document.createElement('span'); w.className = 'who'; w.textContent = who;
+        li.append(t, '  ', w, '  ', message);
+      }
+      log.appendChild(li);
+      const box = $('[data-log-box]');
+      box.scrollTop = box.scrollHeight;
+    }
+    addLog('AI reader', 'suggested 6 rules from 5 sources');
+    addLog('AI checker', 'found all 6 quotes in the law · flagged 2 disagreements: OBL-03 and OBL-05 (OBL-05 isn’t shown here)');
+
+    // --- Counter, progress bar and "all decided" message ---
+    let wasDone = false;
+    function updateGate() {
+      const decided = rows.filter((r) => r.dataset.state === 'approved' || r.dataset.state === 'rejected').length;
+      $('[data-count]').textContent = `${decided} of ${rows.length} decided`;
+      $$('.segs span').forEach((s, i) => s.classList.toggle('on', i < decided));
+      const done = decided === rows.length;
+      $('[data-done]').hidden = !done;
+      if (done && !wasDone) addLog('system', 'all rules shown here are decided');
+      wasDone = done;
+    }
+
+    // --- Put a row into a state and update its buttons ---
+    function setState(row: HTMLElement, state: 'pending' | 'approved' | 'rejected' | 'rechecking', label: string) {
+      row.dataset.state = state;
+      const lbl = $('[data-state-label]', row);
+      lbl.textContent = label;
+      if (state === 'rechecking') {
+        const spin = document.createElement('span'); spin.className = 'spinner'; spin.setAttribute('aria-hidden', 'true');
+        lbl.prepend(spin);
+      }
+      const decided = state === 'approved' || state === 'rejected';
+      $$<HTMLButtonElement>('[data-act]', row).forEach((b) => (b.disabled = decided || state === 'rechecking'));
+      const why = row.querySelector<HTMLInputElement>('[data-approve-reason]');
+      if (why) why.disabled = decided;
+      // On the flagged rule, Approve also needs a reason
+      if (state === 'pending' && why) $<HTMLButtonElement>('[data-act="approve"]', row).disabled = why.value.trim().length < 3;
+      $('[data-ro]', row).hidden = state !== 'rejected';
+      if (!reduceMotion) { row.classList.add('flash'); setTimeout(() => row.classList.remove('flash'), 500); }
+      updateGate();
+    }
+
+    rows.forEach((row) => {
+      const id = row.dataset.id!;
+
+      // Show / hide the source paragraph; the quoted sentence gets an ember underline
+      const srcBtn = $<HTMLButtonElement>('[data-src-btn]', row);
+      const src = $('[data-src]', row);
+      srcBtn.addEventListener('click', () => {
+        const opening = src.hidden;
+        src.hidden = !opening;
+        srcBtn.setAttribute('aria-expanded', String(opening));
+        srcBtn.textContent = opening ? 'Hide source' : 'Show source';
+        const mark = $('mark', src);
+        if (opening) setTimeout(() => mark.classList.add('lit'), 40); else mark.classList.remove('lit');
+      });
+
+      // Flagged rule: Approve unlocks once a reason (3+ characters) is written
+      const why = row.querySelector<HTMLInputElement>('[data-approve-reason]');
+      why?.addEventListener('input', () => {
+        if (row.dataset.state === 'pending') $<HTMLButtonElement>('[data-act="approve"]', row).disabled = why.value.trim().length < 3;
+      });
+
+      // Reject flow: open the reason box, confirm only with a reason
+      const reject = $('[data-reject]', row);
+      const rejWhy = $<HTMLInputElement>('[data-reject-reason]', row);
+      const rejOk = $<HTMLButtonElement>('[data-reject-confirm]', row);
+      const closeReject = () => { reject.hidden = true; rejWhy.value = ''; rejOk.disabled = true; };
+      rejWhy.addEventListener('input', () => (rejOk.disabled = rejWhy.value.trim().length < 3));
+      $('[data-reject-cancel]', row).addEventListener('click', () => { closeReject(); $<HTMLButtonElement>('[data-act="reject"]', row).focus(); });
+      rejOk.addEventListener('click', () => {
+        addLog('human specialist', `rejected ${id} · reason: “${rejWhy.value.trim()}”`);
+        closeReject();
+        setState(row, 'rejected', 'Rejected');
+      });
+
+      // The three main buttons
+      row.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-act]');
+        if (!btn || btn.disabled) return;
+        const act = btn.dataset.act;
+
+        if (act === 'approve') {
+          addLog('human specialist', why ? `approved ${id} despite the flag · reason: “${why.value.trim()}”` : `approved ${id}`);
+          setState(row, 'approved', 'Approved');
+        }
+        if (act === 'reject') {
+          reject.hidden = false;
+          rejWhy.focus(); // move the cursor straight into the reason box
+        }
+        if (act === 'edit') {
+          closeReject();
+          addLog('human specialist', `edited ${id} · sent back to be checked`);
+          setState(row, 'rechecking', 'Re-checking');
+          setTimeout(() => {
+            addLog('AI checker', `re-checked ${id} · quote and conflicts checked again`);
+            setState(row, 'pending', 'Waiting · re-checked');
+          }, reduceMotion ? 200 : 1200);
+        }
+      });
+    });
+
+    // Reset: rules go back to waiting, but the log keeps every entry
+    $('[data-reset]').addEventListener('click', () => {
+      rows.forEach((row) => {
+        const why = row.querySelector<HTMLInputElement>('[data-approve-reason]');
+        if (why) why.value = '';
+        const rej = $('[data-reject]', row); rej.hidden = true;
+        $<HTMLInputElement>('[data-reject-reason]', row).value = '';
+        setState(row, 'pending', 'Waiting');
+      });
+      addLog('', 'Demo reset. Earlier entries stay, because nothing in an audit log can be deleted.', true);
+    });
+  }
+</script>
+
+<style>
+  .tag {
+    display: inline-flex; white-space: nowrap; padding: 6px 10px; border-radius: 20px;
+    font: 500 12px/1 var(--font-sans); color: var(--color-steel); background: var(--color-canvas-white);
+  }
+
+  /* ---------- Buttons (square corners, display face) ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    font: 400 14px/1 var(--font-display); letter-spacing: -0.02em;
+    padding: 8px 14px; border: 1px solid var(--color-graphite); border-radius: 0;
+    transition: background 160ms var(--ease-out-soft), transform 160ms var(--ease-out-soft);
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--color-graphite); color: #fff; }
+  .btn-primary:hover { background: #000; }
+  .btn-ghost { background: transparent; color: var(--color-graphite); }
+  .btn-ghost:hover { background: rgba(0, 0, 0, 0.04); }
+  .btn:disabled { border-color: var(--color-mist); background: var(--color-fog); color: var(--color-steel); cursor: not-allowed; transform: none; }
+
+  .linkbtn {
+    background: none; border: 0; padding: 0; cursor: pointer;
+    font: 500 13px var(--font-sans); color: var(--color-graphite);
+    text-decoration: underline; text-decoration-color: var(--color-mist); text-underline-offset: 3px;
+  }
+  .linkbtn:hover { text-decoration-color: var(--color-ember); }
+
+  /* ---------- The card ---------- */
+  .gate { background: var(--color-canvas-white); border-radius: 20px; overflow: hidden; }
+  .gate-head { padding: 22px 24px 16px; border-bottom: 1px solid var(--color-fog); }
+  .count { font-size: 14px; color: var(--color-steel); font-variant-numeric: tabular-nums; }
+  .segs { display: flex; gap: 4px; margin: 14px 0 8px; }
+  .segs span { flex: 1; height: 6px; border-radius: 3px; background: var(--color-fog); transition: background 320ms var(--ease-out-soft); }
+  .segs span.on { background: var(--color-graphite); }
+  .gate-note { font-size: 13px; line-height: 1.4; color: var(--color-steel); }
+
+  /* ---------- One rule ---------- */
+  .g-row {
+    display: grid; grid-template-columns: 1fr auto; gap: 20px;
+    padding: 20px 24px; border-bottom: 1px solid var(--color-fog);
+    transition: background 320ms var(--ease-out-soft);
+  }
+  @media (max-width: 720px) { .g-row { grid-template-columns: 1fr; padding: 18px 16px; } }
+  .g-row.flash { background: #fbfaf7; }
+  .g-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .g-title { font: 400 17px/1.3 var(--font-display); letter-spacing: -0.01em; }
+  .g-meta { margin-bottom: 10px; font-size: 13px; color: var(--color-steel); }
+  .g-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
+
+  .g-state {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 20px;
+    font: 500 12px/1 var(--font-sans); background: var(--color-fog); color: var(--color-steel);
+  }
+  .g-row[data-state="approved"] .g-state { background: var(--color-graphite); color: #fff; }
+  /* Rejected: graphite text on ivory (brass on ivory is too faint for small text) */
+  .g-row[data-state="rejected"] .g-state { background: var(--color-ivory); color: var(--color-graphite); }
+  .g-row[data-state="rejected"] .g-title, .g-row[data-state="rejected"] .g-meta { color: var(--color-steel); }
+
+  .chip-flag { background: var(--color-ivory); }
+  .chip-flag span { color: var(--color-brass); }
+
+  /* Source paragraph, with the quoted sentence underlined in ember when opened */
+  .source { margin-top: 12px; padding: 14px 16px; border-radius: 8px; background: var(--color-fog); font-size: 14px; line-height: 1.55; color: var(--color-steel); }
+  .source[hidden] { display: none; }
+  .src-id { display: block; margin-bottom: 6px; font: 400 12px var(--font-mono); color: var(--color-brass); }
+  mark.q {
+    color: var(--color-graphite); padding-bottom: 1px;
+    background: linear-gradient(var(--color-ember), var(--color-ember)) left 92% / 0% 2px no-repeat;
+    transition: background-size 800ms var(--ease-out-soft);
+  }
+  mark.q.lit { background-size: 100% 2px; }
+
+  /* The flagged-rule panel */
+  .resolve { margin-top: 12px; padding: 14px 16px; border-radius: 8px; background: #faf8f4; }
+  .resolve-title { margin-bottom: 6px; font: 400 14px var(--font-display); color: var(--color-brass); }
+  .resolve p:not(.resolve-title) { margin-bottom: 10px; font-size: 13px; line-height: 1.45; color: var(--color-steel); }
+  .resolve strong { font-weight: 500; color: var(--color-graphite); }
+
+  .reject { margin-top: 12px; }
+  .reject[hidden] { display: none; }
+  .reason-label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--color-graphite); }
+  .reason-input {
+    flex: 1; width: 100%; min-width: 180px; padding: 9px 10px;
+    border: 1px solid var(--color-graphite); border-radius: 0; background: #fff;
+    font: 400 14px var(--font-sans); color: var(--color-graphite);
+  }
+  .reject .reason-input { width: auto; }
+  .reason-input:disabled { border-color: var(--color-mist); background: var(--color-fog); color: var(--color-steel); }
+  .ro-note { margin-top: 8px; font-size: 12px; color: var(--color-steel); }
+
+  .spinner {
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 1.5px solid var(--color-mist); border-top-color: var(--color-graphite);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .gate-done { padding: 16px 24px; background: var(--color-graphite); color: #fff; font: 400 16px/1.4 var(--font-display); }
+  .gate-done[hidden] { display: none; }
+
+  /* ---------- Audit log ---------- */
+  .log {
+    max-height: 190px; overflow: auto; margin-top: 14px; padding: 14px 16px; border-radius: 8px;
+    background: var(--color-graphite); color: #d6d6d6; font: 400 12px/1.7 var(--font-mono);
+  }
+  /* The header sticks to the top of the log box while entries scroll underneath */
+  .log-h {
+    position: sticky; top: -14px; display: flex; justify-content: space-between; gap: 12px;
+    margin: -14px -16px 4px; padding: 14px 16px 4px; background: var(--color-graphite); color: #a8a8a8;
+  }
+  .log :global(li) { white-space: pre-wrap; }
+  .log :global(.t) { color: #a8a8a8; }
+  .log :global(.who) { color: #e8d6ad; }
+  .log :global(.sys) { color: #a8a8a8; font-style: italic; }
+
+  .stage-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 13px; color: var(--color-steel); }
+</style>
