@@ -1,0 +1,152 @@
+---
+// Chapter 01, section 1.2: today's five-step process, as a journey map.
+// Source (capstone): project-context/1.define/mrd.md §1–2 (the "evidence note").
+// The last row is a plan, not a description of a working product: nothing is built yet.
+//
+// Design note: rows run from what happens today to what the product is planned to change.
+// Ember dots mark where mistakes enter. The two "No" answers are my reading of the MRD,
+// which only says errors enter at interpretation, so the row label says so.
+//
+// Built as a real <table> so screen readers announce the step and row for each cell.
+
+type Mistake = 'yes' | 'no' | 'chance';
+interface Step {
+  n: string;
+  name: string;
+  what: string;
+  pain: string;
+  mistake: Mistake;
+  fundManager: string;
+  planned: string;
+}
+
+const mistakeLabel: Record<Mistake, string> = { yes: 'Yes', no: 'No', chance: 'Found by chance' };
+
+const steps: Step[] = [
+  {
+    n: '01', name: 'New rules arrive',
+    what: 'The rules arrive as documents that aren’t connected to any system.',
+    pain: 'Starts again for every new set of rules.',
+    mistake: 'no',
+    fundManager: 'Receives a fixed legal document listing requirements.',
+    planned: 'AI agents read the (test) rules.',
+  },
+  {
+    n: '02', name: 'Read and interpret',
+    what: 'Reads the legal text and works out what each rule requires.',
+    pain: 'Several rulebooks describe the same report in different words.',
+    mistake: 'yes',
+    fundManager: 'Not involved.',
+    planned: 'Each rule quotes the exact sentence it came from.',
+  },
+  {
+    n: '03', name: 'Set deadlines',
+    what: 'Types each deadline into spreadsheets and to-do tools.',
+    pain: 'Documents end up disagreeing with each other.',
+    mistake: 'yes',
+    fundManager: 'Not involved.',
+    planned: 'An AI checker flags disagreements. Code works out the dates.',
+  },
+  {
+    n: '04', name: 'Chase the senders',
+    what: 'Contacts the outside firms that send the reports.',
+    pain: 'All the chasing is done by hand.',
+    mistake: 'no',
+    fundManager: 'Not involved.',
+    // Reminders are out of scope (system-description.md); notifying firms is future work.
+    planned: 'Each deadline names who sends it. Telling the firms is listed as future work.',
+  },
+  {
+    n: '05', name: 'Fix mistakes',
+    what: 'Corrects a deadline when someone happens to notice a problem.',
+    pain: 'Nothing checks for mismatches. A person has to spot them.',
+    mistake: 'chance',
+    fundManager: 'No up-to-date view of what is due, or why.',
+    planned: 'Disagreements are flagged before anyone approves.',
+  },
+];
+---
+
+<div class="stage wide">
+  <div class="mb-[18px] flex flex-wrap items-center justify-between gap-3">
+    <p class="font-display text-[13px] leading-[1.38] tracking-[-0.01em] text-brass">Today’s process · compliance specialist</p>
+    <span class="source-tag">Based on the project’s evidence note</span>
+  </div>
+
+  <!-- On narrow screens the table scrolls sideways. tabindex="0" lets keyboard users scroll it too. -->
+  <div class="scroller" tabindex="0" role="region" aria-label="Today’s process, five steps (scrolls sideways)">
+    <table>
+      <caption class="sr-only">Today’s five-step process for a compliance specialist, and what the product is planned to change</caption>
+      <thead>
+        <tr>
+          <th scope="col" class="rh">Step</th>
+          {steps.map((s) => (
+            <th scope="col" class="stg"><span class="font-mono">{s.n}</span><b>{s.name}</b></th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row" class="rh">What happens</th>
+          {steps.map((s) => <td>{s.what}</td>)}
+        </tr>
+        <tr>
+          <th scope="row" class="rh">Pain point</th>
+          {steps.map((s) => <td class="pain">{s.pain}</td>)}
+        </tr>
+        <tr>
+          <th scope="row" class="rh">Where mistakes enter (my reading)</th>
+          {steps.map((s) => (
+            <td><span class:list={['err', { 'err-no': s.mistake === 'no' }]}><i aria-hidden="true"></i>{mistakeLabel[s.mistake]}</span></td>
+          ))}
+        </tr>
+        <tr>
+          <th scope="row" class="rh">Fund manager</th>
+          {steps.map((s) => <td>{s.fundManager}</td>)}
+        </tr>
+        <tr class="planned">
+          <th scope="row" class="rh">Planned, with the product</th>
+          {steps.map((s) => <td>{s.planned}</td>)}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="scroll-hint">Scroll sideways to see all five steps.</p>
+</div>
+
+<style>
+  .source-tag {
+    display: inline-flex; white-space: nowrap; padding: 6px 10px; border-radius: 20px;
+    font: 500 12px/1 var(--font-sans); color: var(--color-steel); background: var(--color-canvas-white);
+  }
+
+  .scroller { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 20px; }
+  table {
+    width: 100%; min-width: 760px; border-collapse: collapse; table-layout: fixed;
+    background: var(--color-canvas-white);
+  }
+  th, td {
+    padding: 14px; text-align: left; vertical-align: top;
+    font-size: 13px; line-height: 1.45; font-weight: 400; color: var(--color-steel);
+    border-top: 1px solid var(--color-fog);
+  }
+  thead th { border-top: 0; padding-top: 20px; }
+  /* First column: row labels in brass */
+  .rh { width: 112px; font-family: var(--font-display); color: var(--color-brass); border-right: 1px solid var(--color-fog); }
+  .stg .font-mono { display: block; margin-bottom: 6px; font-size: 11px; color: var(--color-brass); }
+  .stg b { display: block; font: 400 16px/1.2 var(--font-display); letter-spacing: -0.01em; color: var(--color-graphite); }
+  .pain { color: var(--color-graphite); }
+
+  /* Ember dot = mistakes enter here; hollow grey ring = they don't */
+  .err { display: flex; align-items: flex-start; gap: 8px; }
+  /* margin-top centres the dot on the first line of text, even when the label wraps */
+  .err i { flex: none; margin-top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--color-ember); }
+  .err-no i { background: transparent; box-shadow: inset 0 0 0 1px #cfcfcf; }
+
+  /* The planned row sits on a faint warm tint, to set it apart from today */
+  .planned th, .planned td { background: #faf8f4; }
+  .planned td { color: var(--color-graphite); }
+
+  .scroll-hint { display: none; margin-top: 8px; font-size: 12px; color: var(--color-steel); }
+  @media (max-width: 980px) { .scroll-hint { display: block; } }
+</style>

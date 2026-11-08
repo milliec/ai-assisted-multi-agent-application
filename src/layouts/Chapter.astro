@@ -180,6 +180,9 @@ const { n, title, lede, readingTime, phase, glance, toc, next } = Astro.props;
      and Astro's normal styles only reach elements written in this file. All are kept
      inside .article so they can't leak anywhere else. -->
 <style is:global>
+/* Inside @layer base, so these are defaults: a Tailwind class on an element
+   (e.g. text-brass on a paragraph) still wins over them. */
+@layer base {
   .article section { scroll-margin-top: 32px; margin-bottom: 104px; }
   .article h2 {
     display: flex; gap: 14px; align-items: baseline;
@@ -192,4 +195,11 @@ const { n, title, lede, readingTime, phase, glance, toc, next } = Astro.props;
   .article p.first { font-size: 19px; line-height: 1.55; color: var(--color-graphite); }
   /* Text keeps a comfortable line length (about 70 characters); visuals use the full column */
   .article section > h2, .article section > p { max-width: 680px; }
+
+  /* Stage: the ash panel that holds visuals and demos */
+  .article .stage { background: var(--color-ash); border-radius: 6px 0 0 0; padding: 40px; margin: 32px 0; }
+  @media (max-width: 720px) { .article .stage { padding: 16px; } }
+  /* On phones, panels marked "wide" run edge to edge (cancelling the 16px page gutter) */
+  @media (max-width: 860px) { .article .wide { margin-left: -16px; margin-right: -16px; } }
+}
 </style>
