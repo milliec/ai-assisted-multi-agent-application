@@ -1,0 +1,66 @@
+---
+// Chapter 01: Deadlines set by hand.
+// Text follows design/approved-mockup.html, corrected against the capstone's documents
+// (mainly project-context/1.define/mrd.md and prd.md). Visuals are added in the next PRs.
+import Chapter from '../../layouts/Chapter.astro';
+
+const toc = [
+  { id: 'who-it-affects', label: 'Who it affects' },
+  { id: 'how-it-works-today', label: 'How it works today' },
+  { id: 'documents-that-disagree', label: 'Documents that disagree' },
+  { id: 'why-the-answers-drift', label: 'Why the answers drift' },
+];
+---
+
+<Chapter
+  n="01"
+  title="Deadlines set by hand"
+  lede="Investment funds must send reports to regulators and other authorities, each by a deadline set in the rules. Today a human compliance specialist reads the legal text, works out every report the fund owes and types the deadlines into a spreadsheet. The fund manager receives a fixed legal document and has no up-to-date view of what is due."
+  readingTime="5 min"
+  phase="Plan"
+  glance={[
+    { value: '2', label: 'kinds of user for the product' },
+    { value: '5', label: 'steps in today’s process' },
+    { value: '4', label: 'layers of rules behind one fund' },
+  ]}
+  toc={toc}
+  next={{ n: '02', title: 'Who decides what', href: '/chapters/02' }}
+>
+  <section id="who-it-affects">
+    <h2><span class="num">1.1</span>Who it affects</h2>
+    <p class="first">
+      Two kinds of user are planned for the product. A third group sends most of the reports but
+      isn’t a user in this version.
+    </p>
+    <!-- PR E: the two early profiles, the outside firms, and "What I still need to check" -->
+  </section>
+
+  <section id="how-it-works-today">
+    <h2><span class="num">1.2</span>How it works today</h2>
+    <p>
+      Today a human specialist’s work has five steps. Mistakes creep in at steps 2 and 3, where legal
+      text is turned into deadlines.
+    </p>
+    <!-- PR E: the five-step journey map -->
+  </section>
+
+  <section id="documents-that-disagree">
+    <h2><span class="num">1.3</span>Documents that disagree</h2>
+    <p>
+      The team’s own documents give different answers for the same report. No check caught any of
+      these.
+    </p>
+    <!-- PR F: the disagreement chart and its caption -->
+  </section>
+
+  <section id="why-the-answers-drift">
+    <h2><span class="num">1.4</span>Why the answers drift</h2>
+    <p>
+      One fund has to follow several sets of rules at once: Luxembourg law, EU law, tax rules, and the
+      rules of each country where it is sold. Each set has its own regulator, deadlines and wording, so
+      the same report can be described differently in different places. The project’s test data covers
+      several of these layers.
+    </p>
+    <!-- PR F: the four rule layers -->
+  </section>
+</Chapter>
