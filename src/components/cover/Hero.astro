@@ -1,0 +1,185 @@
+---
+// Cover hero: what the product does (left) and the data cards that act as imagery (right).
+// Matches the hero in design/approved-mockup.html.
+import CalendarChart from './CalendarChart.astro';
+
+// The tech stack, each with a plain-words explanation.
+// Wording matters: Next.js is only "intended", and nothing is described as built before it is.
+const stack = [
+  ['AI-Assisted Multi-Agent Application Development', 'method'],
+  ['Cursor + Claude Code', 'AI coding tools'],
+  ['CrewAI', 'runs the product’s AI agents'],
+  ['Next.js', 'website framework, intended'],
+  ['Rule-based date code', 'same answer every time'],
+  ['Answer-key tests', 'automatic marking'],
+  ['WCAG 2.2 AA', 'accessibility standard'],
+];
+---
+
+<section class="pt-10 pb-14 md:pb-20">
+  <div class="mx-auto grid max-w-[1200px] items-center gap-10 px-4 md:px-10 lg:grid-cols-2 lg:gap-15">
+
+    <!-- ============ Left: the words ============ -->
+    <div>
+      <p class="mb-3.5 font-display text-[13px] leading-[1.38] tracking-[-0.01em] text-brass">
+        Case study <span class="font-mono">[2026]</span> · Work in progress · All data is fictional
+      </p>
+
+      <!-- Design note: two plain statements of what the product does, written for someone
+           outside finance. Display face at weight 400, never bold. -->
+      <h1 class="mb-7 text-[clamp(38px,4.5vw,56px)] leading-[0.98]">
+        AI agents draft a fund’s reporting calendar. A human specialist approves every rule.
+      </h1>
+
+      <p class="max-w-[32em] text-[18px] leading-[1.45] text-steel">
+        Investment funds must send regular reports to government regulators, each by a deadline set
+        in law. My tool uses AI to read those laws and draft the deadlines, quoting the exact sentence
+        each one comes from. A human compliance specialist checks and approves the work at three
+        points, and plain code works out the final dates.
+      </p>
+
+      <!-- Buttons: square corners (0px radius), display face 16px.
+           Both links lead to parts built in the next PRs (Chapter 01, and the short version below). -->
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/chapters/01" class="btn btn-primary">Start reading <span aria-hidden="true">→</span></a>
+        <a href="#short" class="btn btn-ghost">Read the short version</a>
+      </div>
+
+      <!-- Design note: the role names both crews in plain words. The stack separates what is
+           decided from what is planned, so nothing is overstated. -->
+      <dl class="mt-12 grid gap-5 gap-y-6 sm:grid-cols-[1fr_150px]">
+        <div>
+          <dt class="mb-1.5 font-display text-[13px] text-brass">Role</dt>
+          <dd class="text-caption">
+            Product designer leading two crews of AI agents. The development crew helps me plan and
+            build the product. The application crew is the set of AI agents inside the product, and I
+            designed how it works. I make every decision.
+          </dd>
+        </div>
+        <div>
+          <dt class="mb-1.5 font-display text-[13px] text-brass">Length</dt>
+          <dd class="text-caption">Six-week</dd>
+        </div>
+        <div class="sm:col-span-2">
+          <dt class="mb-1.5 font-display text-[13px] text-brass">Tech stack</dt>
+          <dd>
+            <ul class="flex flex-wrap gap-1.5">
+              {stack.map(([name, what]) => (
+                <li class="rounded-2xl bg-fog px-[9px] py-1.5 text-[12px] leading-none font-medium whitespace-nowrap max-sm:whitespace-normal">
+                  {name}<span class="ml-1 font-normal text-steel">{what}</span>
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- ============ Right: the data cards ============ -->
+    <!-- Design note: the charts are the imagery. Each card shows real data from the answer key,
+         on the ivory paper surface. -->
+    <div class="rounded-asym bg-ivory p-4 md:px-15 md:pt-14 md:pb-16">
+      <div class="grid gap-2.5 md:grid-cols-2 md:gap-0">
+
+        <!-- Card 1: the 2027 calendar (full width; extra bottom padding makes room for the overlap) -->
+        <div class="col-span-full rounded-2xl bg-canvas-white p-6 md:pb-24">
+          <div class="mb-3 flex flex-wrap items-baseline justify-between gap-2.5">
+            <h3 class="text-[16px] leading-[1.2]">2027 reporting calendar</h3>
+            <span class="font-mono text-[12px] text-steel">Fictional fund · 22 deadlines</span>
+          </div>
+          <CalendarChart />
+          <div class="mt-2.5 flex flex-wrap gap-x-3.5 gap-y-1.5 text-[11px] text-steel">
+            <span><i class="legend-dot bg-brass"></i>Due date</span>
+            <span><i class="legend-dot bg-ember"></i>Moved off a weekend</span>
+            <span><i class="legend-dot shadow-[inset_0_0_0_1.5px_var(--color-brass)]"></i>Weekend rule not yet confirmed</span>
+          </div>
+        </div>
+
+        <!-- Card 2: sources disagree (overlaps the calendar's bottom-left corner on wider screens) -->
+        <div class="overlap relative z-3 rounded-2xl bg-canvas-white p-6 md:col-start-1 md:row-start-2 md:-ml-7 md:mr-2.5">
+          <!-- Label text is graphite, not brass: brass on ivory is only 4.3:1, below the 4.5:1
+               WCAG AA needs for small text. The flag icon keeps the brass colour. -->
+          <span class="inline-flex items-center gap-1.5 rounded-2xl bg-ivory px-[9px] py-[5px] text-[12px] leading-none font-medium text-graphite">
+            <span aria-hidden="true" class="text-[11px] text-brass">⚑</span>Sources disagree
+          </span>
+          <div class="mt-3 grid gap-[9px]">
+            <div class="bar">
+              <span class="col-span-full">The law</span>
+              <span class="track"><i class="fill fill-law"></i></span>
+              <b>6 mo</b>
+            </div>
+            <div class="bar">
+              <span class="col-span-full">A practice guide</span>
+              <span class="track"><i class="fill fill-note"></i></span>
+              <b>4 mo</b>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: review progress (overlaps the calendar's bottom-right corner) -->
+        <div class="overlap relative z-2 rounded-2xl bg-canvas-white p-6 md:col-start-2 md:row-start-2 md:-mr-7 md:ml-2.5">
+          <div class="flex items-center gap-3.5">
+            <svg width="60" height="60" viewBox="0 0 64 64" aria-hidden="true" class="shrink-0">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--color-fog)" stroke-width="6" />
+              <circle class="ring-arc" cx="32" cy="32" r="26" fill="none" stroke="var(--color-ember)"
+                stroke-width="6" stroke-linecap="round" transform="rotate(-90 32 32)" />
+            </svg>
+            <div>
+              <b class="mb-1 block font-display text-[26px] leading-none font-normal tracking-[-0.02em]">4 of 6</b>
+              <p class="text-[13px] leading-[1.4] text-steel">rules approved or rejected by a person</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- Buttons (0 radius, display face) ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 400 16px/1 var(--font-display); letter-spacing: -0.02em;
+    padding: 12px 20px; border: 1px solid var(--color-graphite); border-radius: 0;
+    text-decoration: none;
+    transition: background 160ms var(--ease-out-soft), transform 160ms var(--ease-out-soft);
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--color-graphite); color: #fff; }
+  .btn-primary:hover { background: #000; }
+  .btn-ghost { background: transparent; color: var(--color-graphite); }
+  .btn-ghost:hover { background: rgba(0, 0, 0, 0.04); }
+
+  /* ---------- Overlapping cards ----------
+     A thin ivory outline separates each small card from the calendar it sits on.
+     The overlap itself only happens from tablet width up; on phones the cards stack. */
+  .overlap { box-shadow: 0 0 0 1px var(--color-ivory-line); }
+  @media (min-width: 48rem) { .overlap { margin-top: -72px; } }
+
+  .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+
+  /* ---------- "Sources disagree" bars ---------- */
+  .bar {
+    display: grid; grid-template-columns: 1fr 34px; gap: 4px 8px; align-items: center;
+    font-size: 11px; color: var(--color-steel);
+  }
+  .bar b { font-weight: 500; color: var(--color-graphite); text-align: right; font-variant-numeric: tabular-nums; }
+  .track { height: 6px; background: var(--color-fog); border-radius: 3px; overflow: hidden; }
+  .fill {
+    display: block; height: 100%; border-radius: 3px;
+    animation: grow 900ms var(--ease-out-soft) 700ms both;
+  }
+  .fill-law { width: 100%; background: var(--color-brass); }    /* 6 months */
+  .fill-note { width: 66.6%; background: var(--color-slate); }  /* 4 months = two-thirds of 6 */
+  @keyframes grow { from { width: 0; } }
+
+  /* ---------- "4 of 6" ring ----------
+     The circle's outline is 163.4 units long. Hiding a third of it (54.5) leaves two-thirds showing. */
+  .ring-arc {
+    stroke-dasharray: 163.4;
+    stroke-dashoffset: 54.5;
+    animation: ring-fill 1100ms var(--ease-out-soft) 500ms both;
+  }
+  @keyframes ring-fill { from { stroke-dashoffset: 163.4; } }
+</style>
